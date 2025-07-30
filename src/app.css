@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-gray-300 antialiased;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  
+  * {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded text-sm font-medium transition-all hover:bg-gray-700 hover:border-cyan-600 hover:text-cyan-400 hover:shadow-lg hover:shadow-cyan-900/20 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide;
+  }
+  
+  .btn-primary {
+    @apply bg-cyan-600 border-cyan-600 text-gray-900 hover:bg-cyan-500 hover:border-cyan-500 shadow-lg shadow-cyan-900/30;
+  }
+  
+  .btn-danger {
+    @apply text-red-400 hover:bg-red-900/20 hover:border-red-600;
+  }
+  
+  .btn-small {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded transition-all focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:border-transparent placeholder-gray-500;
+  }
+  
+  .entity-card {
+    @apply bg-gray-800 border border-gray-700 rounded-lg p-4 mb-3 transition-all hover:border-cyan-600 hover:shadow-lg hover:shadow-cyan-900/20 cursor-pointer;
+  }
+}
+  
+@layer utilities {
+  .terminal-glow {
+    @apply shadow-lg shadow-cyan-900/20;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  
+  .cursor-blink::after {
+    content: '_';
+    animation: blink 1s infinite;
+  }
+}
