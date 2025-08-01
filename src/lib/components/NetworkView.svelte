@@ -14,12 +14,14 @@
   let animationFrame;
   
   const nodeColors = {
-    'text': '#00BCD4',      // Cyan
-    'email': '#9C27B0',     // Purple
-    'phone': '#9C27B0',     // Purple
-    'url': '#E91E63',       // Pink
-    'image': '#4CAF50',     // Green
-    'location': '#FF9800'   // Orange
+    'text': '#00BCD4',      
+    'email': '#9C27B0',     
+    'phone': '#9C27B0',     
+    'url': '#E91E63',       
+    'image': '#4CAF50',     
+    'location': '#FF9800',  
+    'vehicle': '#2196F3',   
+    'object': '#FFEB3B'     
   };
   
   function initNodes() {
@@ -41,7 +43,7 @@
         x: centerX + Math.cos(angle) * radius,
         y: centerY + Math.sin(angle) * radius,
         entity,
-        pulsePhase: Math.random() * Math.PI * 2 // Random phase for subtle pulsing
+        pulsePhase: Math.random() * Math.PI * 2
       };
     });
   }
@@ -202,26 +204,32 @@
   }
 </script>
 
-<div class="flex flex-col h-full overflow-hidden bg-gray-900">
+<div class="flex flex-col h-full overflow-hidden bg-gray-900/95">
   <div class="p-4 pb-0">
     <div class="flex justify-between items-start">
       <div>
-        <h3 class="text-sm font-medium text-cyan-400 mb-2">Entity Network Graph</h3>
-        <div class="flex gap-4 text-xs text-gray-500">
+        <h3 class="text-sm font-medium text-cyan-300 mb-2">Entity Network Graph</h3>
+        <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400">
           <span class="flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-cyan-400"></span> Person/Org
+            <span class="w-3 h-3 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50"></span> Person/Org
           </span>
           <span class="flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-purple-600"></span> Contact
+            <span class="w-3 h-3 rounded-full bg-purple-500 shadow-lg shadow-purple-500/50"></span> Contact
           </span>
           <span class="flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-pink-500"></span> Source
+            <span class="w-3 h-3 rounded-full bg-pink-500 shadow-lg shadow-pink-500/50"></span> Source
           </span>
           <span class="flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-green-500"></span> Document
+            <span class="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></span> Document
           </span>
           <span class="flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-orange-500"></span> Location
+            <span class="w-3 h-3 rounded-full bg-orange-500 shadow-lg shadow-orange-500/50"></span> Location
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="w-3 h-3 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50"></span> Vehicle
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50"></span> Object
           </span>
         </div>
       </div>
@@ -229,11 +237,11 @@
         RESET VIEW
       </button>
     </div>
-    <p class="text-xs text-gray-600 mt-2">Pan with mouse • Scroll to zoom</p>
+    <p class="text-xs text-cyan-600/70 mt-2">Pan with mouse • Scroll to zoom</p>
   </div>
   
   <div class="flex-1 p-4 min-h-0">
-    <div class="relative bg-gray-800 rounded-lg h-full border border-gray-700 terminal-glow">
+    <div class="relative bg-gray-800/80 backdrop-blur-sm rounded-lg h-full border border-cyan-600/30 terminal-glow">
       <canvas
         bind:this={canvas}
         class="absolute inset-0 cursor-grab w-full h-full"

@@ -77,3 +77,45 @@ export function formatDate(date) {
     minute: '2-digit'
   });
 }
+
+export function exportProject(notes, entities, links) {
+  const projectData = {
+    version: '1.0',
+    timestamp: new Date().toISOString(),
+    notes,
+    entities,
+    links
+  };
+  
+  const dataStr = JSON.stringify(projectData, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(dataBlob);
+  link.download = `watson-brief-${new Date().toISOString().split('T')[0]}.wf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+export function importProject(file, callback) {
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    try {
+      const projectData = JSON.parse(e.target.result);
+
+      if (!projectData.version || projectData.notes === undefined || !Array.isArray(projectData.entities) || !Array.isArray(projectData.links)) {
+        throw new Error('Invalid Watson file format');
+      }
+      
+      callback(projectData);
+    } catch (error) {
+      console.error('Failed to import project:', error);
+      alert('Failed to import project. Please ensure the file is a valid Watson file (.wf)');
+    }
+  };
+  
+  reader.readAsText(file);
+}

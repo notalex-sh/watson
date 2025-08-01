@@ -1,7 +1,5 @@
 import { writable, derived } from 'svelte/store';
 
-// i know this dosnt need to be a store but i set it up like this when i was first working on it
-
 export const entities = writable([]);
 export const links = writable([]);
 export const notes = writable('');
@@ -31,12 +29,23 @@ export const stats = derived([entities, links], ([$entities, $links]) => {
     }
   }
   
+  const people = $entities.filter(e => e.type === 'text').length;
+  const contacts = $entities.filter(e => e.type === 'email' || e.type === 'phone').length;
+  const locations = $entities.filter(e => e.type === 'location').length;
+  const sources = $entities.filter(e => e.type === 'url').length;
+  const documents = $entities.filter(e => e.type === 'image').length;
+  const vehicles = $entities.filter(e => e.type === 'vehicle').length;
+  const objects = $entities.filter(e => e.type === 'object').length;
+  
   return {
     total: $entities.length,
-    people: $entities.filter(e => e.type === 'text').length,
-    locations: $entities.filter(e => e.type === 'location').length,
-    sources: $entities.filter(e => e.type === 'url').length,
-    documents: $entities.filter(e => e.type === 'image').length,
+    people,
+    contacts,
+    locations,
+    sources,
+    documents,
+    vehicles,
+    objects,
     connections: $links.length,
     mostConnected
   };
