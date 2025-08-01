@@ -20,22 +20,6 @@ Use it when:
 
 ---
 
-## Features
-
-- **Three-column layout**: Notes editor, collapsible map view, and entity management
-- **Enhanced entity types**: People, organisations, locations, vehicles, objects, documents, sources, and contacts
-- **Advanced location search**: Search for locations like Google Maps with OpenStreetMap integration
-- **Quick entity insert**: Press `/` in notes to quickly insert entity references
-- **Save/Load projects**: Export and import Watson files (.wf format) locally
-- **Edit entities**: Update existing entities and their relationships
-- **Animated UI**: Subtle animations and proper z-index management for modals
-- **Keyboard shortcuts**: Fast access to common actions (Ctrl+N, Ctrl+S, Ctrl+O, Ctrl+E, Ctrl+M)
-- **Interactive network visualisation**: Pan and zoom entity relationship graphs
-- **Map visualisation**: View all location entities on an interactive map
-- **Real-time analysis**: Track statistics and identify most connected entities
-
----
-
 ## Privacy and Security
 
 Watson is designed for secure, short-term use in sensitive environments.
