@@ -2,25 +2,36 @@
   import '../app.css';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
-  
+
   let loading = true;
   let loadingProgress = 0;
   let componentsLoaded = 0;
-  const totalComponents = 7; 
+  const totalComponents = 7;
   let assetsLoaded = false;
-  
+  let isUnsupportedScreen = false;
+
+  function checkScreenSize() {
+    isUnsupportedScreen = window.innerWidth < 768;
+  }
+
   if (browser) {
     window.reportComponentLoaded = () => {
       componentsLoaded++;
       loadingProgress = Math.min(95, (componentsLoaded / totalComponents) * 80);
     };
   }
-  
+
   onMount(() => {
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize); 
+
+    if (isUnsupportedScreen) {
+        loading = false;
+        return;
+    }
+      
     const startTime = Date.now();
     
-
-    // Very real loading time
     const checkResourcesLoaded = () => {
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
@@ -44,17 +55,29 @@
     
     setTimeout(checkResourcesLoaded, 100);
     
-    // Fallback timeout
     setTimeout(() => {
       if (loading) {
         loadingProgress = 100;
         loading = false;
       }
     }, 500);
+
+    return () => {
+        window.removeEventListener('resize', checkScreenSize);
+    };
   });
 </script>
 
-{#if loading}
+{#if isUnsupportedScreen}
+    <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50 text-center p-4">
+        <div>
+            <h1 class="text-3xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
+            <p class="text-gray-400">
+                Unsupported screen dimensions. Please use a larger screen.
+            </p>
+        </div>
+    </div>
+{:else if loading}
   <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
     <div class="text-center">
       <div class="mb-8">
@@ -93,7 +116,7 @@
         {#if loadingProgress < 20}
           Initializing secure environment...
         {:else if loadingProgress < 40}
-          Loading application components...
+           Loading application components...
         {:else if loadingProgress < 60}
           Setting up entity tracking...
         {:else if loadingProgress < 80}
@@ -108,11 +131,10 @@
   </div>
 {/if}
 
-<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading}>
+<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading || isUnsupportedScreen}>
   <slot />
 </div>
 
-<!-- TODO move this into tailwind but i was experimenting -->
 <style>
   :global(html) {
     background: #111827;
