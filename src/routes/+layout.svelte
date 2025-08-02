@@ -2,6 +2,7 @@
   import '../app.css';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+  import { notes, entities, links, events } from '$lib/stores';
 
   let loading = true;
   let loadingProgress = 0;
@@ -14,6 +15,13 @@
     isUnsupportedScreen = window.innerWidth < 768;
   }
 
+  function beforeUnloadHandler(e) {
+    if ($notes.length > 0 || $entities.length > 0 || $links.length > 0 || $events.length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+  }
+
   if (browser) {
     window.reportComponentLoaded = () => {
       componentsLoaded++;
@@ -23,7 +31,8 @@
 
   onMount(() => {
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize); 
+    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener('beforeunload', beforeUnloadHandler); 
 
     if (isUnsupportedScreen) {
         loading = false;
@@ -64,6 +73,7 @@
 
     return () => {
         window.removeEventListener('resize', checkScreenSize);
+        window.removeEventListener('beforeunload', beforeUnloadHandler); // Clean up the listener
     };
   });
 </script>
