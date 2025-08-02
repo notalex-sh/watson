@@ -15,8 +15,22 @@ Watson is not a full intelligence platform. It's a disposable tactical workspace
 Use it when:
 - Responding to a live incident
 - Writing an initial brief or report under time pressure
+- Building a timeline of key events
 - Tracking entities and relationships before formal entry
 - You need a fast, trusted tool that doesn't retain data
+
+---
+
+## Features
+
+- **Note Taking**: A clean, distraction-free editor for drafting intelligence reports.
+- **Entity Tracking**: Log and manage key actors, locations, items, and other entities.
+- **Network Graph**: Automatically visualize the relationships between your entities.
+- **Timeline View**: Build a chronological view of events and link entities to them.
+- **Interactive Map**: Plot any entities with coordinates on an interactive map.
+- **Analysis Dashboard**: Get a quick overview of your collected intelligence.
+- **Secure & Private**: 100% client-side. No data ever leaves your browser.
+- **Save & Load**: Export your entire session to a local `.wf` file to resume later.
 
 ---
 
@@ -34,16 +48,6 @@ Nothing leaves your device. Watson is safe to use for pre-sanitised or sensitive
 
 ---
 
-## Open Source and Transparency
-
-Watson is fully open source to ensure verifiable security and operational transparency.
-
-- You can inspect the code to confirm that no data is sent or stored externally
-- There are no hidden trackers, analytics, or background requests
-- You are free to fork, audit, or self-host for complete control
-
----
-
 ## Keyboard Shortcuts
 
 | Action              | Shortcut         |
@@ -52,50 +56,19 @@ Watson is fully open source to ensure verifiable security and operational transp
 | Save project        | Ctrl + S         |
 | Open project        | Ctrl + O         |
 | Add entity          | Ctrl + E         |
-| Toggle map          | Ctrl + M         |
-| Quick insert entity | /                |
-| View entity         | Click on entity  |
-| Zoom graph          | Scroll wheel     |
+| Toggle side panel   | Ctrl + M         |
+| Quick insert        | /                |
+| Quick insert time   | /now + Space     |
 
 ---
 
 ## Entity Types
 
 - **Person/Organisation**: Individuals and groups
-- **Email**: Email addresses with mailto: links
-- **Phone**: Phone numbers with tel: links
+- **Email**: Email addresses
+- **Phone**: Phone numbers
 - **URL/Source**: Web sources and references
 - **Image/Document**: Uploaded or pasted images
-- **Location**: Places with optional coordinates and map display
+- **Location**: Places with optional coordinates
 - **Vehicle**: Vehicles with description and license plate
-- **Object**: Physical items with categories (weapons, electronics, documents, etc.)
-
----
-
-## Intended Users
-
-- Intelligence professionals
-- Investigative teams and analysts
-- Incident responders
-- Law enforcement personnel
-- Security professionals
-- Anyone needing a secure scratchpad for fast tactical documentation
-
----
-
-## Project Status
-
-Watson is under active development. Feedback, forks, and contributions are welcome.
-
-## TODO
-
-Future enhancements under consideration:
-
-- [ ] Timeline view for temporal analysis
-- [ ] Enhanced export formats (PDF, DOCX)
-- [ ] Bulk entity import from CSV
-- [ ] Entity tagging and categorisation
-- [ ] Advanced filtering and search operators
-- [ ] Offline map tile caching
-- [ ] Custom entity types
-- [ ] Entity merge and split operations
+- **Object**: Physical items with categories
