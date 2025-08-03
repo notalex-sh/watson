@@ -81,7 +81,7 @@ export function formatDate(dateString) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  return `${hours}:${minutes} ${day}/${month}/${year}`;
+  return `${day}/${month}/${year} ${hours}:${minutes} hours`;
 }
 
 
@@ -92,7 +92,7 @@ export function exportProject(notes, entities, links, events) {
     notes,
     entities,
     links,
-    events // Ensure events are included in the saved object
+    events 
   };
 
   const dataStr = JSON.stringify(projectData, null, 2);
@@ -117,8 +117,7 @@ export function importProject(file, callback) {
       if (!projectData.version || projectData.notes === undefined || !Array.isArray(projectData.entities) || !Array.isArray(projectData.links)) {
         throw new Error('Invalid Watson file format');
       }
-
-      // Pass the whole data object to the callback
+      
       callback(projectData);
     } catch (error) {
       console.error('Failed to import project:', error);

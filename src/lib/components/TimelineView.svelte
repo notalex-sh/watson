@@ -4,33 +4,10 @@
   import { events, entities, notes } from '$lib/stores';
   import { formatDate } from '$lib/utils';
 
-  let newEventTitle = '';
-  let newEventDate = new Date().toISOString().slice(0, 16);
-  let newEventDescription = '';
-
   let editingEventId = null;
   let editingTitle = '';
   let editingDate = '';
   let editingDescription = '';
-
-  function addEvent() {
-    if (!newEventTitle) return;
-    events.update(e => [{
-      id: Date.now(),
-      title: newEventTitle,
-      date: newEventDate,
-      description: newEventDescription,
-      linkedEntities: []
-    }, ...e]);
-    newEventTitle = '';
-    newEventDate = new Date().toISOString().slice(0, 16);
-    newEventDescription = '';
-  }
-
-  function insertCurrentTimeToNotes() {
-    const formattedNow = formatDate(new Date());
-    notes.update(n => (n ? n + ' ' : '') + formattedNow);
-  }
 
   function linkEntityToEvent(eventId, entityId) {
     if (!entityId) return;
@@ -45,9 +22,7 @@
   }
 
   function deleteEvent(eventId) {
-    if (confirm('Are you sure you want to delete this event?')) {
-        events.update(currentEvents => currentEvents.filter(event => event.id !== eventId));
-    }
+    events.update(currentEvents => currentEvents.filter(event => event.id !== eventId));
   }
 
   function startEdit(event) {
@@ -87,31 +62,26 @@
   });
 </script>
 
-<div class="flex flex-col h-full bg-gray-900/95">
-    <div class="p-4 border-b border-cyan-600/30 flex-shrink-0">
-        <div class="flex justify-between items-center mb-3">
-            <h3 class="text-sm font-medium text-cyan-300">> NEW TIMELINE EVENT</h3>
-            <button on:click={insertCurrentTimeToNotes} class="btn btn-small">Insert Time</button>
-        </div>
-        <div class="space-y-3">
-            <input type="text" bind:value={newEventTitle} placeholder="Event Title..." class="input" />
-            <textarea bind:value={newEventDescription} placeholder="Event Description..." rows="2" class="input"></textarea>
-            <input type="datetime-local" bind:value={newEventDate} class="input" />
-            <button on:click={addEvent} class="btn btn-primary w-full">Log Event</button>
-        </div>
+<div class="flex flex-col h-full bg-gray-900/30">
+    <div class="p-4 text-center border-b border-cyan-600/30">
+        <p class="text-xs text-cyan-500/70">Press <span class="font-bold text-cyan-400">Shift + Tab</span> to add a new Event</p>
     </div>
 
     <div class="flex-1 overflow-y-auto p-4 min-h-0">
         <div class="relative space-y-8">
             <div class="absolute left-4 top-4 bottom-0 w-0.5 bg-gradient-to-b from-cyan-500/50 via-purple-500/50 to-pink-500/50 shadow-lg shadow-cyan-500/30"></div>
 
+            {#if $events.length === 0}
+                <p class="text-center text-gray-500 text-sm py-10">No events logged yet.</p>
+            {/if}
+
             {#each $events.sort((a, b) => new Date(b.date) - new Date(a.date)) as event (event.id)}
                 <div class="pl-10 relative">
-                    <div class="absolute left-4 top-1 w-4 h-4 -translate-x-1/2 rounded-full bg-gray-900 border-2 border-cyan-400 flex items-center justify-center">
-                        <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+                    <div class="absolute left-4 top-1 w-4 h-4 -translate-x-1/2 rounded-full bg-gray-900 border-2 {event.type === 'incident' ? 'border-red-400' : 'border-cyan-400'} flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full {event.type === 'incident' ? 'bg-red-400' : 'bg-cyan-400'} animate-pulse"></div>
                     </div>
 
-                    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-3 hover:border-cyan-500 transition-all duration-300">
+                    <div class="bg-gray-800/50 backdrop-blur-sm border rounded-lg p-3 {event.type === 'incident' ? 'border-red-500/50 hover:border-red-400' : 'border-gray-700 hover:border-cyan-500'} transition-all duration-300">
                         {#if editingEventId === event.id}
                             <div class="space-y-3">
                                 <input type="text" bind:value={editingTitle} class="input input-sm"/>
@@ -126,8 +96,8 @@
                             <div>
                                 <div class="flex justify-between items-start">
                                     <div>
-                                        <p class="text-xs text-pink-400 font-mono">{formatDate(event.date)}</p>
-                                        <h4 class="font-bold text-cyan-300 mt-1">{event.title}</h4>
+                                        <p class="text-xs {event.type === 'incident' ? 'text-red-400' : 'text-pink-400'} font-mono">{formatDate(event.date)}</p>
+                                        <h4 class="font-bold {event.type === 'incident' ? 'text-red-300' : 'text-cyan-300'} mt-1">{event.title}</h4>
                                     </div>
                                 </div>
                                 {#if event.description}

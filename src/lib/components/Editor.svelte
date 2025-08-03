@@ -1,7 +1,9 @@
 <script>
-  import { notes, entities, events, links } from '$lib/stores';
+  import { notes, entities, events } from '$lib/stores';
   import { handleAutoPairs, formatDate } from '$lib/utils';
   import { derived } from 'svelte/store';
+
+  export let isMapPanelCollapsed = true;
 
   let textarea;
   let showQuickInsert = false;
@@ -11,17 +13,14 @@
 
   $: wordCount = $notes.trim() ? $notes.trim().split(/\s+/).length : 0;
   $: charCount = $notes.length;
-
   const quickInsertItems = derived([entities, events], ([$entities, $events]) => {
       const entityItems = $entities.map(e => ({...e, type: 'entity', label: e.content}));
       const eventItems = $events.map(ev => ({...ev, type: 'event', label: ev.title}));
       return [...entityItems, ...eventItems];
   });
-
   $: filteredItems = $quickInsertItems.filter(item =>
     item.label.toLowerCase().includes(quickInsertSearch.toLowerCase())
   ).slice(0, 7);
-
   $: if (showQuickInsert) {
     selectedIndex = 0;
   }
@@ -32,13 +31,12 @@
         const textBefore = e.target.value.substring(0, start);
         if (textBefore.endsWith('/now')) {
             e.preventDefault();
-            const position = start - 4; 
+            const position = start - 4;
             const before = $notes.substring(0, position);
             const after = $notes.substring(start);
             const formattedNow = formatDate(new Date());
 
             notes.set(before + formattedNow + after);
-
             setTimeout(() => {
                 const newPosition = position + formattedNow.length;
                 textarea.selectionStart = textarea.selectionEnd = newPosition;
@@ -52,8 +50,7 @@
       const start = e.target.selectionStart;
       const textBefore = e.target.value.substring(0, start);
       const lastChar = textBefore[textBefore.length - 1];
-
-      if (!lastChar || lastChar === ' ' || lastChar === '\n') {
+      if (!lastChar || lastChar === ' ' || lastChar === '\n' || lastChar === '(') {
         e.preventDefault();
         quickInsertPosition = start;
         quickInsertSearch = '';
@@ -106,8 +103,10 @@
         contentToInsert = formatDate(item.date);
     }
 
-    const before = $notes.substring(0, quickInsertPosition);
-    const after = $notes.substring(quickInsertPosition + quickInsertSearch.length + 1);
+    const currentText = textarea.value;
+    const cursorPos = textarea.selectionStart;
+    const before = currentText.substring(0, quickInsertPosition);
+    const after = currentText.substring(cursorPos);
 
     notes.set(before + contentToInsert + after);
     showQuickInsert = false;
@@ -121,7 +120,6 @@
 
   function getQuickInsertPosition() {
     if (!textarea || !showQuickInsert) return { top: 0, left: 0 };
-
     const dummy = document.createElement('div');
     const computedStyle = window.getComputedStyle(textarea);
     Object.assign(dummy.style, {
@@ -134,7 +132,6 @@
         border: computedStyle.border,
         width: computedStyle.width
     });
-
     dummy.textContent = $notes.substring(0, quickInsertPosition);
     document.body.appendChild(dummy);
 
@@ -156,7 +153,7 @@
   $: quickInsertPos = getQuickInsertPosition();
 </script>
 
-<div class="flex-1 flex flex-col bg-gray-900/95">
+<div class="flex-1 flex flex-col bg-gray-950">
   <div class="flex-1 p-6 overflow-y-auto min-h-0 relative">
     <textarea
       bind:this={textarea}
@@ -165,18 +162,19 @@
       on:input={handleInput}
       placeholder="> Welcome to Watson — Tactical Intelligence, Captured Fast"
       class="w-full h-full bg-transparent border-none outline-none text-cyan-100 resize-none text-sm leading-relaxed placeholder-cyan-600/50 focus:placeholder-cyan-500/70 font-mono"
-      style="text-shadow: 0 0 2px rgba(6, 182, 212, 0.3);"
+      style="text-shadow: 0 0 5px rgba(0, 221, 255, 0.3);"
     />
 
     {#if showQuickInsert}
       <div
-        class="absolute bg-gray-800/95 backdrop-blur-sm border border-cyan-400 rounded-lg shadow-2xl shadow-cyan-500/30 z-50 max-w-sm"
+        class="absolute bg-gray-900/95 backdrop-blur-sm border border-cyan-400 rounded-lg shadow-2xl shadow-cyan-500/30 z-50 max-w-sm"
         style="top: {quickInsertPos.top}px; left: {quickInsertPos.left}px"
       >
         <div class="px-3 py-2 border-b border-cyan-600/30">
           <p class="text-xs text-gray-400">Quick Insert</p>
           <p class="text-xs text-cyan-300 mt-1 font-mono">/{quickInsertSearch}</p>
         </div>
+        
         {#if filteredItems.length === 0}
           <div class="px-3 py-2 text-sm text-gray-500">No items found</div>
         {:else}
@@ -203,15 +201,15 @@
     {/if}
   </div>
 
-  <div class="bg-gray-800/90 backdrop-blur-sm border-t border-cyan-600/30 px-6 py-3 flex justify-between items-center">
+  <div class="bg-gray-900/90 backdrop-blur-sm border-t border-cyan-600/30 px-6 py-3 flex justify-between items-center">
     <div class="flex gap-6 text-xs text-gray-400">
       <span>Words: <span class="font-medium text-cyan-400">{wordCount}</span></span>
       <span>Characters: <span class="font-medium text-cyan-400">{charCount}</span></span>
-      <span>Entities: <span class="font-medium text-cyan-300">{$entities.length}</span></span>
-      <span>Links: <span class="font-medium text-cyan-300">{$links.length}</span></span>
     </div>
     <div class="flex items-center gap-4 text-xs text-gray-500">
+      {#if isMapPanelCollapsed}
         <span class="text-cyan-600/50">[Tactical Intel Drafting Tool]</span>
+      {/if}
     </div>
   </div>
 </div>

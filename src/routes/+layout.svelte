@@ -73,7 +73,7 @@
 
     return () => {
         window.removeEventListener('resize', checkScreenSize);
-        window.removeEventListener('beforeunload', beforeUnloadHandler); // Clean up the listener
+        window.removeEventListener('beforeunload', beforeUnloadHandler); 
     };
   });
 </script>

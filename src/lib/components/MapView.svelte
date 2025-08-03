@@ -46,13 +46,10 @@
   function updateMarkers() {
     if (!map || !L) return;
     
-    // Clear existing markers
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
     
-    // Add new markers
     locationEntities.forEach(entity => {
-      // Using a custom icon that works on deployment
       const icon = L.default.divIcon({
         className: 'custom-map-marker',
         html: '<div class="w-6 h-6 bg-orange-500 rounded-full border-2 border-cyan-400 shadow-lg shadow-orange-500/50 animate-pulse"></div>',
@@ -66,7 +63,6 @@
       markers.push(marker);
     });
     
-    // Fit bounds if we have markers
     if (markers.length > 0) {
       const group = new L.default.featureGroup(markers);
       map.fitBounds(group.getBounds().pad(0.1));
@@ -99,7 +95,7 @@
   });
 </script>
 
-<div class="flex-1 flex flex-col bg-gray-800/30 p-4 h-full overflow-hidden" class:hidden={isCollapsed}>
+<div class="flex-1 flex flex-col bg-gray-900/30 p-4 h-full overflow-hidden" class:hidden={isCollapsed}>
   {#if locationEntities.length === 0}
     <div class="flex-1 flex items-center justify-center">
       <div class="text-center">
