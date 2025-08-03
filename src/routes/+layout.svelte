@@ -1,6 +1,6 @@
 <script>
   import '../app.css';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { notes, entities, links, events } from '$lib/stores';
 
@@ -10,6 +10,8 @@
   const totalComponents = 7;
   let assetsLoaded = false;
   let isUnsupportedScreen = false;
+  let canvas;
+  let animationFrameId;
 
   function checkScreenSize() {
     isUnsupportedScreen = window.innerWidth < 768;
@@ -32,17 +34,72 @@
   onMount(() => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-    window.addEventListener('beforeunload', beforeUnloadHandler); 
+    window.addEventListener('beforeunload', beforeUnloadHandler);
 
     if (isUnsupportedScreen) {
         loading = false;
         return;
     }
+
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    let nodes = [];
+
+    for (let i = 0; i < 50; i++) {
+        nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: Math.random() * 2 + 1
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#030712';
+        ctx.fillRect(0, 0, width, height);
+
+        nodes.forEach(node => {
+            node.x += node.vx;
+            node.y += node.vy;
+
+            if (node.x < 0 || node.x > width) node.vx *= -1;
+            if (node.y < 0 || node.y > height) node.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#00DDFF';
+            ctx.fill();
+        });
+
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dx = nodes[i].x - nodes[j].x;
+                const dy = nodes[i].y - nodes[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[i].x, nodes[i].y);
+                    ctx.lineTo(nodes[j].x, nodes[j].y);
+                    ctx.strokeStyle = `rgba(0, 221, 255, ${1 - dist / 150})`;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        animationFrameId = requestAnimationFrame(draw);
+    }
+
+    draw();
       
     const startTime = Date.now();
     
     const checkResourcesLoaded = () => {
       if (document.fonts && document.fonts.ready) {
+        
         document.fonts.ready.then(() => {
           assetsLoaded = true;
           loadingProgress = Math.max(loadingProgress, 90);
@@ -53,7 +110,8 @@
         
         const elapsed = Date.now() - startTime;
         const minTime = 200;
-        
+     
+           
         setTimeout(() => {
           loading = false;
         }, Math.max(0, minTime - elapsed));
@@ -66,7 +124,8 @@
     
     setTimeout(() => {
       if (loading) {
-        loadingProgress = 100;
+        loadingProgress 
+ = 100;
         loading = false;
       }
     }, 500);
@@ -74,6 +133,7 @@
     return () => {
         window.removeEventListener('resize', checkScreenSize);
         window.removeEventListener('beforeunload', beforeUnloadHandler); 
+        cancelAnimationFrame(animationFrameId);
     };
   });
 </script>
@@ -83,30 +143,16 @@
         <div>
             <h1 class="text-3xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
             <p class="text-gray-400">
-                Unsupported screen dimensions. Please use a larger screen.
+                Unsupported screen dimensions.
+                Please use a larger screen.
             </p>
         </div>
     </div>
 {:else if loading}
-  <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
-    <div class="text-center">
-      <div class="mb-8">
-        <div class="w-20 h-20 mx-auto relative">
-          <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-lg animate-pulse blur-xl"></div>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-16 h-16 relative animate-spin-slow">
-              <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 via-purple-400 to-pink-400 rounded-lg blur-md"></div>
-              <div class="absolute inset-2 bg-gray-900 rounded-lg"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-6 h-6 bg-gradient-to-br from-cyan-400 to-purple-400 rounded animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-          <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/0 via-purple-500/30 to-cyan-500/0 blur-2xl animate-pulse"></div>
-        </div>
-      </div>
-      
-      <h1 class="text-3xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
+  <div class="fixed inset-0 bg-gray-950 flex items-center justify-center z-50 overflow-hidden">
+    <canvas bind:this={canvas} class="absolute inset-0 w-full h-full"></canvas>
+    <div class="text-center z-10">
+      <h1 class="text-4xl font-bold text-cyan-400 mb-2 tracking-wider animate-pulse">WATSON</h1>
       <p class="text-sm text-gray-500 mb-8">Intel. Fast. Field-Ready.</p>
       
       <div class="w-64 mx-auto mb-4">
@@ -116,7 +162,8 @@
             style="width: {loadingProgress}%"
           ></div>
           <div 
-            class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-30 animate-pulse"
+         
+           class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-30 animate-pulse"
             style="width: {loadingProgress}%"
           ></div>
         </div>
@@ -126,7 +173,8 @@
         {#if loadingProgress < 20}
           Initializing secure environment...
         {:else if loadingProgress < 40}
-           Loading application components...
+   
+            Loading application components...
         {:else if loadingProgress < 60}
           Setting up entity tracking...
         {:else if loadingProgress < 80}
@@ -134,6 +182,7 @@
         {:else if loadingProgress < 95}
           Finalizing interface...
         {:else}
+          
           Ready to launch...
         {/if}
       </p>
@@ -141,7 +190,8 @@
   </div>
 {/if}
 
-<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading || isUnsupportedScreen}>
+<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading ||
+isUnsupportedScreen}>
   <slot />
 </div>
 

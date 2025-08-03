@@ -6,8 +6,6 @@ It helps you keep track of people, places, vehicles, objects, and relationships 
 
 > Intel. Fast. Field-Ready.
 
-![banner](https://raw.githubusercontent.com/notalex-sh/watson/refs/heads/main/banner.png)
-
 ---
 
 ## Purpose
