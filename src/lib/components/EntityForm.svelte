@@ -124,12 +124,10 @@
 
     // Handle event linking
     events.update(currentEvents => {
-        // First, remove the entity link from any event that currently has it
         let updatedEvents = currentEvents.map(ev => ({
             ...ev,
             linkedEntities: ev.linkedEntities.filter(id => id !== entityIdToLink)
         }));
-        // Then, if a new event is selected, add the link to it
         if (linkedEventId) {
             updatedEvents = updatedEvents.map(ev => {
                 if (ev.id === linkedEventId) {
@@ -144,7 +142,7 @@
     if (editingEntity) {
       entities.update(ents => ents.map(e => e.id === editingEntity.id ? { ...e, type, content, description, metadata } : e));
       links.update(lnks => {
-        const filtered = lnks.filter(l => l.from !== editingEntity.id);
+        const filtered = lnks.filter(l => l.from !== editingEntity.id && l.to !== editingEntity.id);
         const newLinks = linkedTo.map(toId => ({ from: editingEntity.id, to: toId }));
         return [...filtered, ...newLinks];
       });
@@ -201,6 +199,42 @@
         </div>
     {/if}
 
+    {#if type === 'email'}
+      <div>
+        <label for="entityEmail" class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+        <input id="entityEmail" type="email" bind:value={emailContent} placeholder="user@example.com" class="input"/>
+      </div>
+    {/if}
+
+    {#if type === 'phone'}
+      <div>
+        <label for="entityPhone" class="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+        <input id="entityPhone" type="tel" bind:value={phoneContent} placeholder="+61 400 000 000" class="input"/>
+      </div>
+    {/if}
+
+    {#if type === 'url'}
+      <div>
+        <label for="entityUrl" class="block text-xs font-medium text-gray-500 mb-1">URL</label>
+        <input id="entityUrl" type="url" bind:value={urlContent} placeholder="https://..." class="input"/>
+      </div>
+    {/if}
+
+    {#if type === 'image'}
+      <div>
+        <label for="imageInput" class="block text-xs font-medium text-gray-500 mb-1">Image</label>
+        <button type="button" class="w-full border-2 border-dashed border-cyan-600/30 rounded p-6 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-600/10 transition-all" on:drop={handleImageDrop} on:dragover|preventDefault on:click={() => document.getElementById('imageInput').click()} on:keydown={(e) => e.key === 'Enter' && document.getElementById('imageInput').click()}>
+          {#if imageData}
+            <img src={imageData} alt="Preview" class="max-h-32 mx-auto" />
+          {:else}
+            <p class="text-cyan-500/70 text-sm">Drop image or click to select</p>
+            <p class="text-cyan-600/50 text-xs mt-1">Paste: Ctrl+V</p>
+          {/if}
+        </button>
+        <input type="file" id="imageInput" accept="image/*" on:change={handleImageSelect} class="hidden"/>
+      </div>
+    {/if}
+
     {#if type === 'location'}
         <div>
             <label for="locationSearch" class="block text-xs font-medium text-gray-500 mb-1">Search</label>
@@ -227,6 +261,38 @@
             <label for="locationCoords" class="block text-xs font-medium text-gray-500 mb-1">Coordinates (Lat, Lng)</label>
             <input id="locationCoords" type="text" bind:value={locationCoords} placeholder="-33.8688, 151.2093" class="input" />
         </div>
+    {/if}
+
+    {#if type === 'vehicle'}
+      <div>
+        <label for="vehicleInfo" class="block text-xs font-medium text-gray-500 mb-1">Vehicle Description</label>
+        <input id="vehicleInfo" type="text" bind:value={vehicleInfo} placeholder="Make, model, color..." class="input"/>
+      </div>
+      <div>
+        <label for="vehiclePlate" class="block text-xs font-medium text-gray-500 mb-1">License Plate</label>
+        <input id="vehiclePlate" type="text" bind:value={vehiclePlate} placeholder="ABC-123" class="input"/>
+      </div>
+    {/if}
+
+    {#if type === 'object'}
+      <div>
+        <label for="objectInfo" class="block text-xs font-medium text-gray-500 mb-1">Object Description</label>
+        <input id="objectInfo" type="text" bind:value={objectInfo} placeholder="Description of item..." class="input"/>
+      </div>
+      <div>
+        <label for="objectCategory" class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+        <select id="objectCategory" bind:value={objectCategory} class="input">
+          <option value="">Select category...</option>
+          <option value="weapon">Weapon</option>
+          <option value="electronics">Electronics</option>
+          <option value="documents">Documents</option>
+          <option value="jewelry">Jewelry</option>
+          <option value="drugs">Drugs/Substances</option>
+          <option value="money">Money/Currency</option>
+          <option value="clothing">Clothing</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
     {/if}
     
     <div>
