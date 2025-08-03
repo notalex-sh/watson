@@ -142,7 +142,6 @@
           <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-400">
             <div><span class="text-cyan-300 font-mono">Shift+Tab</span></div><div>Quick Add New Item</div>
             <div><span class="text-cyan-300 font-mono">/</span></div><div>Quick Insert Entity</div>
-            <div><span class="text-cyan-300 font-mono">/now</span> + Space</div><div>Insert Current Time</div>
             
             <div><span class="text-cyan-300 font-mono">Ctrl+N</span></div><div>Open New Brief</div>
             <div><span class="text-cyan-300 font-mono">Ctrl+S</span></div><div>Save Project</div>
