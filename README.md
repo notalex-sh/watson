@@ -1,5 +1,5 @@
 # Watson 
-## Tactical Intelligence Platform
+_Tactical Intelligence Platform_
 
 > Intel. Fast. Field Ready.
 
