@@ -1,8 +1,9 @@
-# Watson - Tactical Intelligence Platform
-
-![Watson Banner](./banner.png)
+# Watson 
+## Tactical Intelligence Platform
 
 > Intel. Fast. Field Ready.
+
+![Watson Banner](./banner.png)
 
 Watson is a lightweight, browser-based intelligence analysis tool designed for rapid data capture, visualization, and analysis. Built for investigators, journalists, and researchers, it provides a powerful suite of tools to quickly make sense of complex information during dynamic situations.
 
