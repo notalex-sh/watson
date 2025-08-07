@@ -1,5 +1,7 @@
 import { writable, derived } from 'svelte/store';
 
+export const briefTitle = writable('New Brief');
+export const caseNumber = writable('');
 export const entities = writable([]);
 export const links = writable([]);
 export const notes = writable('');
@@ -17,7 +19,7 @@ export const allLinks = derived([links, events], ([$links, $events]) => {
     const eventLinks = [];
     $events.forEach(event => {
         event.linkedEntities.forEach(entityId => {
-            eventLinks.push({ from: event.id, to: entityId });
+            eventLinks.push({ from: event.id, to: entityId, label: 'linked' });
         });
     });
     return [...entityLinks, ...eventLinks];

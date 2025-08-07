@@ -85,10 +85,12 @@ export function formatDate(dateString) {
 }
 
 
-export function exportProject(notes, entities, links, events) {
+export function exportProject(notes, entities, links, events, briefTitle, caseNumber) {
   const projectData = {
-    version: '1.2',
+    version: '1.4',
     timestamp: new Date().toISOString(),
+    briefTitle,
+    caseNumber,
     notes,
     entities,
     links,
@@ -100,7 +102,7 @@ export function exportProject(notes, entities, links, events) {
 
   const link = document.createElement('a');
   link.href = URL.createObjectURL(dataBlob);
-  link.download = `watson-brief-${new Date().toISOString().split('T')[0]}.wf`;
+  link.download = `${briefTitle.replace(/\s/g, '_')}-${new Date().toISOString().split('T')[0]}.wf`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

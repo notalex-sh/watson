@@ -13,39 +13,22 @@
 
   $: wordCount = $notes.trim() ? $notes.trim().split(/\s+/).length : 0;
   $: charCount = $notes.length;
+  
   const quickInsertItems = derived([entities, events], ([$entities, $events]) => {
       const entityItems = $entities.map(e => ({...e, type: 'entity', label: e.content}));
       const eventItems = $events.map(ev => ({...ev, type: 'event', label: ev.title}));
       return [...entityItems, ...eventItems];
   });
+
   $: filteredItems = $quickInsertItems.filter(item =>
     item.label.toLowerCase().includes(quickInsertSearch.toLowerCase())
   ).slice(0, 7);
+
   $: if (showQuickInsert) {
     selectedIndex = 0;
   }
 
   function handleKeyDown(e) {
-    if (e.key === ' ' && !showQuickInsert) {
-        const start = e.target.selectionStart;
-        const textBefore = e.target.value.substring(0, start);
-        if (textBefore.endsWith('/now')) {
-            e.preventDefault();
-            const position = start - 4;
-            const before = $notes.substring(0, position);
-            const after = $notes.substring(start);
-            const formattedNow = formatDate(new Date());
-
-            notes.set(before + formattedNow + after);
-            setTimeout(() => {
-                const newPosition = position + formattedNow.length;
-                textarea.selectionStart = textarea.selectionEnd = newPosition;
-                textarea.focus();
-            }, 0);
-            return;
-        }
-    }
-
     if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
       const start = e.target.selectionStart;
       const textBefore = e.target.value.substring(0, start);
@@ -78,7 +61,25 @@
         showQuickInsert = false;
       }
     } else {
-      handleAutoPairs(e, e.target);
+        handleAutoPairs(e, e.target);
+    }
+     if (e.key === ' ' && !showQuickInsert) {
+        const start = e.target.selectionStart;
+        const textBefore = e.target.value.substring(0, start);
+        if (textBefore.endsWith('/now')) {
+            e.preventDefault();
+            const position = start - 4;
+            const before = $notes.substring(0, position);
+            const after = $notes.substring(start);
+            const formattedNow = formatDate(new Date());
+            notes.set(before + formattedNow + after);
+            setTimeout(() => {
+                const newPosition = position + formattedNow.length;
+                textarea.selectionStart = textarea.selectionEnd = newPosition;
+                textarea.focus();
+            }, 0);
+            return;
+        }
     }
   }
 
@@ -110,7 +111,6 @@
 
     notes.set(before + contentToInsert + after);
     showQuickInsert = false;
-
     setTimeout(() => {
       const newPosition = before.length + contentToInsert.length;
       textarea.selectionStart = textarea.selectionEnd = newPosition;
@@ -181,7 +181,8 @@
           <div class="py-1">
             {#each filteredItems as item, index}
               <button
-                class="w-full text-left px-3 py-2 hover:bg-cyan-600/20 text-sm flex items-center gap-2 transition-colors {index === selectedIndex ? 'bg-cyan-600/30 text-cyan-300' : 'text-gray-300'}"
+                class="w-full text-left px-3 py-2 hover:bg-cyan-600/20 text-sm flex items-center 
+                   gap-2 transition-colors {index === selectedIndex ? 'bg-cyan-600/30 text-cyan-300' : 'text-gray-300'}"
                 on:click={() => insertItem(item)}
               >
                 {#if item.type === 'entity'}

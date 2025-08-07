@@ -4,11 +4,11 @@
   import { events, entities, notes } from '$lib/stores';
   import { formatDate } from '$lib/utils';
 
+  export let presentationMode = false;
   let editingEventId = null;
   let editingTitle = '';
   let editingDate = '';
   let editingDescription = '';
-
   function linkEntityToEvent(eventId, entityId) {
     if (!entityId) return;
     events.update(currentEvents => {
@@ -63,9 +63,11 @@
 </script>
 
 <div class="flex flex-col h-full bg-gray-900/30">
-    <div class="p-4 text-center border-b border-cyan-600/30">
-        <p class="text-xs text-cyan-500/70">Press <span class="font-bold text-cyan-400">Shift + Tab</span> to add a new Event</p>
-    </div>
+    {#if !presentationMode}
+        <div class="p-4 text-center border-b border-cyan-600/30">
+            <p class="text-xs text-cyan-500/70">Press <span class="font-bold text-cyan-400">Shift + Tab</span> to add a new Event</p>
+        </div>
+    {/if}
 
     <div class="flex-1 overflow-y-auto p-4 min-h-0">
         <div class="relative space-y-8">
@@ -88,7 +90,7 @@
                                 <textarea bind:value={editingDescription} class="input input-sm" rows="3"></textarea>
                                 <input type="datetime-local" bind:value={editingDate} class="input input-sm"/>
                                 <div class="flex gap-2 mt-2">
-                                    <button on:click={() => saveEdit(event.id)} class="btn btn-primary btn-small flex-1">Save</button>
+                                    <button on:click="{() => saveEdit(event.id)}" class="btn btn-primary btn-small flex-1">Save</button>
                                     <button on:click={cancelEdit} class="btn btn-small flex-1">Cancel</button>
                                 </div>
                             </div>
@@ -112,7 +114,7 @@
                                             {/if}
                                         {/each}
                                     </div>
-                                    <select class="input input-sm" on:change={(e) => linkEntityToEvent(event.id, e.target.value)}>
+                                    <select class="input input-sm" on:change="{(e) => linkEntityToEvent(event.id, e.target.value)}">
                                         <option value="">+ Link Entity...</option>
                                         {#each $entities.filter(ent => !event.linkedEntities.includes(ent.id)) as entity}
                                             <option value={entity.id}>{entity.content}</option>
@@ -120,8 +122,8 @@
                                     </select>
                                 </div>
                                 <div class="flex gap-2 mt-4">
-                                     <button on:click={() => startEdit(event)} class="btn btn-small flex-1">Edit</button>
-                                     <button on:click={() => deleteEvent(event.id)} class="btn btn-small btn-danger flex-1">Delete</button>
+                                    <button on:click="{() => startEdit(event)}" class="btn btn-small flex-1">Edit</button>
+                                    <button on:click="{() => deleteEvent(event.id)}" class="btn btn-small btn-danger flex-1">Delete</button>
                                 </div>
                             </div>
                         {/if}
