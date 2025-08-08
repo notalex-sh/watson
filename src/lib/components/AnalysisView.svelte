@@ -47,6 +47,11 @@
       <div class="text-2xl font-semibold text-yellow-400">{$stats.objects}</div>
       <div class="text-xs text-yellow-500/70 uppercase tracking-wider">Objects</div>
     </div>
+
+    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 border border-green-600/30 hover:border-green-400 transition-all">
+      <div class="text-2xl font-semibold text-green-400">{$stats.intel}</div>
+      <div class="text-xs text-green-500/70 uppercase tracking-wider">Intel</div>
+    </div>
     
     <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 border border-pink-600/30 hover:border-pink-400 transition-all">
       <div class="text-2xl font-semibold text-pink-400">{$stats.sources}</div>

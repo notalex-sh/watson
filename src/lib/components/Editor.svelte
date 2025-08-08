@@ -19,11 +19,9 @@
       const eventItems = $events.map(ev => ({...ev, type: 'event', label: ev.title}));
       return [...entityItems, ...eventItems];
   });
-
   $: filteredItems = $quickInsertItems.filter(item =>
     item.label.toLowerCase().includes(quickInsertSearch.toLowerCase())
   ).slice(0, 7);
-
   $: if (showQuickInsert) {
     selectedIndex = 0;
   }
@@ -61,7 +59,11 @@
         showQuickInsert = false;
       }
     } else {
-        handleAutoPairs(e, e.target);
+        if (e.key === 'Tab' && e.shiftKey) {
+          // do nothing to allow the quick add modal to open
+        } else {
+          handleAutoPairs(e, e.target);
+        }
     }
      if (e.key === ' ' && !showQuickInsert) {
         const start = e.target.selectionStart;
@@ -88,7 +90,7 @@
       const start = quickInsertPosition;
       const current = e.target.selectionStart;
 
-      if (current >= start) {
+      if (current > start) {
         quickInsertSearch = e.target.value.substring(start + 1, current);
       } else {
         showQuickInsert = false;

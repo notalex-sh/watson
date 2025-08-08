@@ -156,8 +156,8 @@
           <h3 class="text-base font-medium text-cyan-400 mb-3">Core Features</h3>
             <ul class="list-disc list-inside space-y-2 text-gray-400">
                 <li><strong>Dynamic Note-Taking:</strong> A central editor for capturing free-form intelligence as it comes in.</li>
-                <li><strong>Entity Management:</strong> Add, edit, and link entities (People, Locations, Vehicles, etc.) to build a clear operational picture.</li>
-                <li><strong>Visual Analysis:</strong> Automatically generated Network Graphs, Timelines, and Maps provide instant visual context.</li>
+                <li><strong>Entity Management:</strong> Add, edit, and link entities (People, Locations, Vehicles, Intel etc.) to build a clear operational picture.</li>
+                <li><strong>Visual Analysis:</strong> Automatically generated Network Graphs, Timelines, Maps and Intel views provide instant visual context.</li>
                 <li><strong>Presentation Mode:</strong> A full-screen, interactive view of your data, perfect for briefings and analysis.</li>
                 <li><strong>Data Persistence:</strong> Save and load your entire project, including notes, entities, and views, to a local file.</li>
             </ul>
@@ -168,6 +168,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-400">
             <div><kbd class="text-cyan-300 font-mono">Shift + Tab</kbd> - Quick Add New Item</div>
             <div><kbd class="text-cyan-300 font-mono">/ (in notes)</kbd> - Quick Insert Entity</div>
+            <div><kbd class="text-cyan-300 font-mono">@ / # (in Quick Add)</kbd> - Mention Entity / Event</div>
             <div><kbd class="text-cyan-300 font-mono">/now + Space</kbd> - Insert Current Time</div>
             <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + P</kbd> - Enter Presentation Mode</div>
             <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + S</kbd> - Save Project</div>
@@ -179,6 +180,7 @@
             <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + 3</kbd> - Switch to Analysis Tab</div>
             <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + 4</kbd> - Switch to Map View</div>
             <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + 5</kbd> - Switch to Timeline View</div>
+            <div><kbd class="text-cyan-300 font-mono">Ctrl/Cmd + 6</kbd> - Switch to Intel View</div>
           </div>
         </div>
         <p class="text-gray-400 text-xs pt-4 border-t border-gray-700 mt-4">

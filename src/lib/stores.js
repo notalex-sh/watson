@@ -57,6 +57,7 @@ export const stats = derived([allItems, allLinks], ([$allItems, $allLinks]) => {
   const vehicles = $allItems.filter(e => e.type === 'vehicle').length;
   const objects = $allItems.filter(e => e.type === 'object').length;
   const eventsCount = $allItems.filter(e => e.itemType === 'event').length;
+  const intelCount = $allItems.filter(e => e.type === 'intel').length;
 
   return {
     total: $allItems.length,
@@ -67,6 +68,7 @@ export const stats = derived([allItems, allLinks], ([$allItems, $allLinks]) => {
     sources,
     vehicles,
     objects,
+    intel: intelCount,
     connections: $allLinks.length,
     mostConnected
   };

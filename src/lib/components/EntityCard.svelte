@@ -18,7 +18,7 @@
   const typeLabels = {
     'event': 'Event', 'incident': 'Incident', 'text': 'Person/Org', 'email': 'Email', 
     'phone': 'Phone', 'url': 'Source', 'image': 'Document', 'location': 'Location', 
-    'vehicle': 'Vehicle', 'object': 'Object'
+    'vehicle': 'Vehicle', 'object': 'Object', 'intel': 'Intel'
   };
   function remove() {
     if(entity.itemType === 'event'){
@@ -47,19 +47,19 @@
     <div class="flex justify-between items-start mb-2">
         <div>
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {
-                              entity.type === 'incident' ? 'bg-red-900/30 text-red-400' :
+                entity.type === 'incident' ? 'bg-red-900/30 text-red-400' :
                 entity.itemType === 'event' ? 'bg-blue-900/30 text-blue-400' :
                 entity.type === 'text' ? 'bg-cyan-900/30 text-cyan-400' :
                 entity.type === 'email' || entity.type === 'phone' ? 'bg-purple-900/30 text-purple-400' :
                 entity.type === 'location' ? 'bg-orange-900/30 text-orange-400' :
                 entity.type === 'vehicle' ? 'bg-blue-900/30 text-blue-400' :
+                entity.type === 'intel' ? 'bg-green-900/30 text-green-400' :
                 'bg-gray-700 text-gray-400'
             }">
-                {typeLabels[entity.type] ||
-                entity.type}
+                {typeLabels[entity.type] || entity.type}
             </span>
              <div class="text-xs text-gray-600 mt-1">ID: {typeof entity.id === 'number' ?
-               entity.id.toString().padStart(4, '0') : entity.id}</div>
+             entity.id.toString().padStart(4, '0') : entity.id}</div>
         </div>
         <button class="btn btn-small" on:click|stopPropagation={() => copyToClipboard(entity.content)}>Copy</button>
     </div>
@@ -70,7 +70,7 @@
         {/if}
     </div>
     {#if entity.description}
-     <p class="text-sm text-gray-500 overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{entity.description}</p>
+      <p class="text-sm text-gray-500 overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{entity.description}</p>
     {/if}
     <div class="text-xs text-gray-600 mt-2">{formatDate(entity.timestamp || entity.date)}</div>
 </div>
@@ -91,8 +91,7 @@
         <button class="text-gray-400 hover:text-gray-300" on:click={() => showModal = false}>✕</button>
       </div>
       <div class="p-6 space-y-4">
-    
-     <h2 class="text-xl font-bold text-gray-100">{entity.content}</h2>
+        <h2 class="text-xl font-bold text-gray-100">{entity.content}</h2>
         {#if entity.description}
           <div>
             <h3 class="text-sm font-medium text-gray-400 mb-2">Notes</h3>
@@ -101,14 +100,12 @@
         {/if}
         {#if linkedItems.length > 0}
           <div>
-    
-       <h3 class="text-sm font-medium text-gray-400 mb-2">Linked Items ({linkedItems.length})</h3>
+            <h3 class="text-sm font-medium text-gray-400 mb-2">Linked Items ({linkedItems.length})</h3>
             <div class="flex flex-wrap gap-2">
               {#each linkedItems as linked}
                 <span class="bg-gray-800 px-3 py-1 rounded text-xs text-cyan-400">{linked.content}</span>
               {/each}
             </div>
-      
           </div>
         {/if}
          <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-800">

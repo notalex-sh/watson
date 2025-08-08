@@ -5,21 +5,21 @@
     import NetworkView from '$lib/components/NetworkView.svelte';
     import TimelineView from '$lib/components/TimelineView.svelte';
     import MapView from '$lib/components/MapView.svelte';
+    import IntelView from '$lib/components/IntelView.svelte';
     import { browser } from '$app/environment';
     import { goto } from '$app/navigation';
     let activeTab = 'network';
     let selectedEntity = null;
-
     $: entities = $allItems.filter(item => item.itemType === 'entity');
     
-    $: linkedItems = selectedEntity ? $allLinks
+    $: linkedItems = selectedEntity ?
+        $allLinks
         .filter(l => l.from === selectedEntity.id || l.to === selectedEntity.id)
         .map(l => {
             const linkedId = l.from === selectedEntity.id ? l.to : l.from;
             return $allItems.find(e => e.id === linkedId);
         })
         .filter(e => e) : [];
-
     onMount(() => {
         if (browser) {
             const handleKeydown = (e) => {
@@ -31,8 +31,7 @@
                     }
                 }
             };
-   
-             window.addEventListener('keydown', handleKeydown);
+            window.addEventListener('keydown', handleKeydown);
             return () => window.removeEventListener('keydown', handleKeydown);
         }
     });
@@ -40,27 +39,30 @@
 
 <div class="w-screen h-screen bg-gray-950 text-gray-300 p-8 flex flex-col gap-8">
     <div class="flex-1 flex gap-8 min-h-0">
-        <div class="w-1/2 h-full flex flex-col">
+        <div class="w-1/3 h-full flex flex-col">
             <h2 class="text-lg font-bold text-cyan-400 mb-4">Timeline</h2>
             <div class="flex-1 bg-gray-900/50 rounded-lg min-h-0">
                 <TimelineView presentationMode={true} />
             </div>
         </div>
-  
-       <div class="w-1/2 h-full flex flex-col">
+        <div class="w-1/3 h-full flex flex-col">
+            <h2 class="text-lg font-bold text-green-400 mb-4">Intel</h2>
+            <div class="flex-1 bg-gray-900/50 rounded-lg min-h-0">
+                <IntelView presentationMode={true} />
+            </div>
+        </div>
+       <div class="w-1/3 h-full flex flex-col">
             <h2 class="text-lg font-bold text-cyan-400 mb-4">Entities</h2>
             <div class="flex-1 bg-gray-900/50 rounded-lg p-4 overflow-y-auto min-h-0">
                 <div class="space-y-2">
                     {#if entities.length === 0}
-                
-                 <p class="text-center text-gray-500 text-sm py-10">No entities added yet.</p>
+                        <p class="text-center text-gray-500 text-sm py-10">No entities added yet.</p>
                     {:else}
                         {#each entities as entity (entity.id)}
                             <button class="w-full text-left bg-gray-800/50 rounded p-3 text-sm text-gray-300 hover:bg-cyan-500/10 transition-colors" on:click={() => selectedEntity = entity}>
                                 {entity.content}
                             </button>
                         {/each}
-                    
                     {/if}
                 </div>
             </div>
@@ -82,8 +84,7 @@
             </button>
         </div>
         <div class="flex-1 bg-gray-900/50 rounded-lg min-h-0">
-           
-         {#if activeTab === 'network'}
+            {#if activeTab === 'network'}
                 <NetworkView />
             {:else if activeTab === 'map'}
                 <MapView />

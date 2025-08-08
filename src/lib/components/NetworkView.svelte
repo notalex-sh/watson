@@ -14,7 +14,7 @@
   const nodeColors = {
     'text': '#00BCD4', 'email': '#9C27B0', 'phone': '#9C27B0', 'url': '#E91E63',
     'location': '#FF9800', 'vehicle': '#2196F3', 'object': '#FFEB3B',
-    'event': '#2196F3', 'incident': '#E91E63'
+    'event': '#2196F3', 'incident': '#E91E63', 'intel': '#4CAF50'
   };
   function applyLayout(shouldFit = true) {
     if (!canvas || $allItems.length === 0) {
@@ -158,7 +158,6 @@
       ctx.arc(node.x, node.y, nodeSize * 2, 0, Math.PI * 2);
       ctx.fill();
 
-   
       ctx.beginPath();
       ctx.arc(node.x, node.y, nodeSize, 0, Math.PI * 2);
       ctx.fillStyle = nodeColors[node.item.type] || '#666';
@@ -171,7 +170,6 @@
       ctx.font = `${12 / zoom}px 'JetBrains Mono', monospace`;
 
       ctx.textAlign = 'center';
-      
       const textWidth = ctx.measureText(label).width;
       ctx.fillStyle = 'rgba(17, 24, 39, 0.9)';
       ctx.fillRect(node.x - textWidth/2 - 4/zoom, node.y + nodeSize + 5/zoom, textWidth + 8/zoom, 16/zoom);
@@ -183,8 +181,8 @@
   }
 
   function handleMouseDown(e) { isPanning = true;
-  panStart.x = e.clientX - panOffset.x; panStart.y = e.clientY - panOffset.y;
-  canvas.style.cursor = 'grabbing';
+    panStart.x = e.clientX - panOffset.x; panStart.y = e.clientY - panOffset.y;
+    canvas.style.cursor = 'grabbing';
   }
   function handleMouseMove(e) { if (isPanning) { panOffset.x = e.clientX - panStart.x;
   panOffset.y = e.clientY - panStart.y; draw();
@@ -239,16 +237,16 @@
 
 <div class="flex flex-col h-full overflow-hidden bg-gray-900/30">
   <div class="p-2 flex flex-col md:flex-row gap-2">
-      <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-xs text-gray-400">
+      <div class="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-x-3 gap-y-1 text-xs text-gray-400">
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['event']};"></span>Event</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['incident']};"></span>Incident</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['text']};"></span>Person/Org</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['phone']};"></span>Contact</span>
-  
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['url']};"></span>Source</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['location']};"></span>Location</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['vehicle']};"></span>Vehicle</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['object']};"></span>Object</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['intel']};"></span>Intel</span>
       </div>
       <div class="flex-shrink-0 flex gap-2">
           <select bind:value={layout} class="input input-sm" on:change="{() => applyLayout(true)}">
@@ -266,7 +264,6 @@
       </div>
   </div>
   <div class="flex-1 p-2 pt-0 min-h-0">
-   
    <div class="relative bg-gray-800/80 backdrop-blur-sm rounded-lg h-full border border-cyan-600/30 terminal-glow">
       <canvas bind:this={canvas} class="absolute inset-0 cursor-grab w-full h-full" on:mousedown="{handleMouseDown}" on:mousemove="{handleMouseMove}" on:mouseup="{handleMouseUp}" on:mouseleave="{handleMouseUp}" on:wheel="{handleWheel}"/>
     </div>
