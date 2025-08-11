@@ -2,7 +2,7 @@
   import '../app.css';
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
-  import { notes, entities, links, events } from '$lib/stores';
+  import { notes, entities, links, events, exportRenderer } from '$lib/stores';
 
   let loading = true;
   let loadingProgress = 0;
@@ -73,13 +73,11 @@
             ctx.fillStyle = '#00DDFF';
             ctx.fill();
         });
-
         for (let i = 0; i < nodes.length; i++) {
             for (let j = i + 1; j < nodes.length; j++) {
                 const dx = nodes[i].x - nodes[j].x;
                 const dy = nodes[i].y - nodes[j].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-
                 if (dist < 150) {
                     ctx.beginPath();
                     ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -107,11 +105,8 @@
       }
       if (componentsLoaded >= totalComponents && assetsLoaded) {
         loadingProgress = 100;
-        
         const elapsed = Date.now() - startTime;
         const minTime = 200;
-     
-           
         setTimeout(() => {
           loading = false;
         }, Math.max(0, minTime - elapsed));
@@ -121,11 +116,9 @@
     };
     
     setTimeout(checkResourcesLoaded, 100);
-    
     setTimeout(() => {
       if (loading) {
-        loadingProgress 
- = 100;
+        loadingProgress = 100;
         loading = false;
       }
     }, 500);
@@ -137,6 +130,12 @@
     };
   });
 </script>
+
+{#if $exportRenderer}
+    <div id="pdf-export-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 1000px; height: 750px; background-color: #111827;">
+        <svelte:component this={$exportRenderer.component} {...$exportRenderer.props} />
+    </div>
+{/if}
 
 {#if isUnsupportedScreen}
     <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50 text-center p-4">
@@ -161,9 +160,8 @@
             class="bg-cyan-600 h-full transition-all duration-300 ease-out rounded-full"
             style="width: {loadingProgress}%"
           ></div>
-          <div 
-         
-           class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-30 animate-pulse"
+          <div           
+            class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-30 animate-pulse"
             style="width: {loadingProgress}%"
           ></div>
         </div>
@@ -172,8 +170,7 @@
       <p class="text-xs text-gray-600 min-h-[16px]">
         {#if loadingProgress < 20}
           Initializing secure environment...
-        {:else if loadingProgress < 40}
-   
+         {:else if loadingProgress < 40}
             Loading application components...
         {:else if loadingProgress < 60}
           Setting up entity tracking...
@@ -181,8 +178,7 @@
           Preparing analysis tools...
         {:else if loadingProgress < 95}
           Finalizing interface...
-        {:else}
-          
+         {:else}
           Ready to launch...
         {/if}
       </p>
@@ -190,8 +186,7 @@
   </div>
 {/if}
 
-<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading ||
-isUnsupportedScreen}>
+<div class="h-screen min-h-screen overflow-hidden bg-gray-900 transition-opacity duration-500 flex flex-col relative z-10" class:opacity-0={loading || isUnsupportedScreen}>
   <slot />
 </div>
 

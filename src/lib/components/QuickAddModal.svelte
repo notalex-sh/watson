@@ -28,7 +28,7 @@
     let linkedEntityContent = '';
     let linkedLocationName = '';
     let linkedLocationCoords = '';
-    let linkedEventId = null; 
+    let linkedEventIds = []; 
     let typeInputRef, mainFieldRef, descriptionRef;
 
     const allTypes = [
@@ -36,27 +36,32 @@
         { key: 'phone', label: 'Phone' }, { key: 'email', label: 'Email' }, { key: 'vehicle', label: 'Vehicle' },
         { key: 'object', label: 'Object' }, { key: 'location', label: 'Location' }, { key: 'url', label: 'URL/Source' },
         { key: 'intel', label: 'Intel' }
-    ];
+ 
+       ];
     onMount(() => {
         if (editingEntity) {
             selectedType = allTypes.find(t => t.key === (editingEntity.itemType === 'event' ? editingEntity.type : editingEntity.type));
             mainField = editingEntity.content;
             description = editingEntity.description || '';
             if (editingEntity.itemType === 'event') {
-                eventDateTimeStr = formatDate(editingEntity.date).replace(' hours', '');
+              
+   eventDateTimeStr = formatDate(editingEntity.date).replace(' hours', '');
                 existingLinkedIds = editingEntity.linkedEntities || [];
             }
             if (editingEntity.type === 'vehicle') {
                 vehiclePlate = editingEntity.metadata?.plate || '';
             }
-            if (editingEntity.type === 'location') {
+            if (editingEntity.type 
+ === 'location') {
                 locationCoords = editingEntity.metadata?.lat ? `${editingEntity.metadata.lat}, ${editingEntity.metadata.lng}` : '';
             }
             if (editingEntity.itemType !== 'event') {
                 existingLinkedIds = $links
-                    .filter(l => l.from === editingEntity.id || l.to === editingEntity.id)
+                    .filter(l => l.from === editingEntity.id ||
+ l.to === editingEntity.id)
                     .map(l => (l.from === editingEntity.id ? l.to : l.from));
             }
+            linkedEventIds = $events.filter(ev => ev.linkedEntities.includes(editingEntity.id)).map(ev => ev.id);
             step = 2;
         }
     });
@@ -193,6 +198,7 @@
             entities.update(e => [{
                 id: newId, type: le.type, content: le.content,
                 description: `${le.type.charAt(0).toUpperCase() + le.type.slice(1)} for ${mainField}`,
+        
                 metadata: le.metadata || {}, timestamp: new Date().toISOString()
             }, ...e]);
             return newId;
@@ -200,30 +206,53 @@
         const allLinkedIds = [...newlyCreatedLinkedIds, ...existingLinkedIds];
         
         if (editingEntity) {
+            const entityIdToUpdate = editingEntity.id;
             if (editingEntity.itemType === 'event') {
                 events.update(evs => evs.map(ev => ev.id === editingEntity.id ? {
                     ...ev,
                     title: mainField,
+            
                     date: parseDateString(eventDateTimeStr).toISOString(),
                     description,
                     linkedEntities: allLinkedIds
                 } : ev));
             } else {
-                entities.update(ents => ents.map(e => e.id === editingEntity.id ? {
+                entities.update(ents => ents.map(e => e.id === entityIdToUpdate ? {
                     ...e,
                     content: mainField,
                     description,
+             
                     metadata: {
                         ...e.metadata,
                         plate: vehiclePlate,
                         lat: selectedType.key === 'location' ? parseFloat(locationCoords.split(',')[0]) : e.metadata.lat,
+            
                         lng: selectedType.key === 'location' ? parseFloat(locationCoords.split(',')[1]) : e.metadata.lng,
                     }
                 } : e));
                 links.update(l => {
-                    const otherLinks = l.filter(link => link.from !== editingEntity.id && link.to !== editingEntity.id);
-                    const newLinks = allLinkedIds.map(linkedId => ({ from: editingEntity.id, to: linkedId }));
+                    const otherLinks = l.filter(link => link.from !== entityIdToUpdate && link.to !== entityIdToUpdate);
+                    const newLinks = allLinkedIds.map(linkedId => ({ from: entityIdToUpdate, to: linkedId }));
                     return [...otherLinks, ...newLinks];
+               
+                });
+                
+                events.update(currentEvents => {
+                    let updatedEvents = currentEvents.map(ev => ({
+                        ...ev,
+                        linkedEntities: ev.linkedEntities.filter(id => id !== entityIdToUpdate)
+                    }));
+
+                    linkedEventIds.forEach(eventId => {
+                        updatedEvents = updatedEvents.map(ev => {
+                            if (ev.id === eventId) {
+                                return { ...ev, linkedEntities: [...new Set([...ev.linkedEntities, entityIdToUpdate])] };
+                            }
+                            return ev;
+                        });
+                    });
+
+                    return updatedEvents;
                 });
             }
         } else {
@@ -252,18 +281,21 @@
                 entities.update(e => [{
                     id: primaryId, type: selectedType.key, content: mainField,
                     description, metadata, timestamp: new Date().toISOString()
+              
                 }, ...e]);
 
-                if(linkedEventId) {
+                linkedEventIds.forEach(eventId => {
                     events.update(currentEvents => {
                         return currentEvents.map(ev => {
-                            if (ev.id === linkedEventId) {
-                                return { ...ev, linkedEntities: [...ev.linkedEntities, primaryId] };
+                            if (ev.id === eventId) {
+              
+                                  return { ...ev, linkedEntities: [...ev.linkedEntities, primaryId] };
                             }
                             return ev;
-                        });
+                   
+                         });
                     });
-                }
+                });
                 
                 allLinkedIds.forEach(linkedId => {
                     links.update(l => [...l, { from: primaryId, to: linkedId }]);
@@ -284,7 +316,6 @@
       const start = e.target.selectionStart;
       const textBefore = e.target.value.substring(0, start);
       const lastChar = textBefore[textBefore.length - 1];
-
       if (lastChar === '@' || lastChar === '#') {
         mentionType = lastChar;
         mentionPosition = start;
@@ -332,11 +363,12 @@
       const after = description.substring(mentionPosition + mentionSearch.length);
       const content = item.content || item.title;
       description = before + content + after;
-
       if (mentionType === '@') {
         addExistingLinkedId(item.id);
       } else if (mentionType === '#') {
-        linkedEventId = item.id;
+        if (!linkedEventIds.includes(item.id)) {
+            linkedEventIds = [...linkedEventIds, item.id];
+        }
       }
       mentionType = '';
     }
@@ -346,162 +378,203 @@
     <div class="bg-gray-950/95 backdrop-blur-md border border-cyan-400 rounded-lg max-w-xl w-full shadow-2xl shadow-cyan-500/30 p-6" on:click|stopPropagation>
         {#if step === 1}
             <div>
-                <label for="typeInput" class="block text-sm text-cyan-300 mb-2">> CLASSIFY NEW INTEL</label>
-                <div class="relative">
+                <div 
+ class="relative">
                   <input id="typeInput" type="text" bind:this={typeInputRef} bind:value={typeInput} on:keydown={handleTypeInput} placeholder="Begin entry classification..." class="input text-lg" autofocus/>
                     {#if suggestions.length > 0}
                         <div class="absolute top-full w-full mt-1 bg-gray-800 border border-cyan-500/50 rounded-lg shadow-lg z-10">
-                            {#each suggestions as suggestion, i}
-                                <button class="w-full text-left px-4 py-2 text-sm transition-colors {i === suggestionIndex ? 'bg-cyan-600/30 text-cyan-300' : 'text-gray-300 hover:bg-cyan-600/20'}" on:click={() => selectSuggestion(suggestion)}>{suggestion.label}</button>
+              
+               {#each suggestions as suggestion, i}
+                                <button class="w-full text-left px-4 py-2 text-sm transition-colors {i === suggestionIndex ?
+ 'bg-cyan-600/30 text-cyan-300' : 'text-gray-300 hover:bg-cyan-600/20'}" on:click={() => selectSuggestion(suggestion)}>{suggestion.label}</button>
                             {/each}
                         </div>
                     {/if}
                 </div>
-                  <div class="text-xs text-gray-500 mt-2 p-2 bg-gray-900/50 rounded border border-gray-700">
+     
+               <div class="text-xs text-gray-500 mt-2 p-2 bg-gray-900/50 rounded border border-gray-700">
                     <p class="font-bold text-gray-400">Entry Types:</p>
                     <ul class="list-disc pl-4 mt-1">
                         <li><span class="text-cyan-400">Standard Entries:</span> Person, Phone, Email, Vehicle, etc.</li>
-                        <li><span class="text-orange-400">Location:</span> A standard entry that will also be plotted on the map.</li>
+  
+                       <li><span class="text-orange-400">Location:</span> A standard entry that will also be plotted on the map.</li>
                         <li><span class="text-pink-400">Event/Incident:</span> Creates a timestamped entry on the Timeline.</li>
-                        <li><span class="text-green-400">Intel:</span> A reference to a previous report or piece of intelligence.</li>
+                        <li><span class="text-green-400">Intel:</span> A reference to a previous report or piece 
+ of intelligence.</li>
                     </ul>
                 </div>
             </div>
         {:else if step === 2}
            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-gray-300 border-b border-gray-700 pb-2">{editingEntity ? 'Edit' : 'New'} <span class="text-cyan-400">{selectedType.label}</span></h3>
+                <h3 class="text-lg font-semibold text-gray-300 border-b border-gray-700 pb-2">{editingEntity ?
+ 'Edit' : 'New'} <span class="text-cyan-400">{selectedType.label}</span></h3>
 
                 {#if selectedType.key === 'location'}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Search</label>
                        <div class="flex gap-2">
-                            <input type="text" bind:value={locationSearch} placeholder="Search for a place..." class="input flex-1" on:keydown={(e) => e.key === 'Enter' && searchLocation(false)} />
-                            <button class="btn btn-small" on:click={() => searchLocation(false)} disabled={searchingLocation}>{searchingLocation ? '...' : 'Search'}</button>
+   
+                         <input type="text" bind:value={locationSearch} placeholder="Search for a place..." class="input flex-1" on:keydown={(e) => e.key === 'Enter' && searchLocation(false)} />
+                            <button class="btn btn-small" on:click={() => searchLocation(false)} disabled={searchingLocation}>{searchingLocation ?
+ '...' : 'Search'}</button>
                         </div>
                         {#if searchResults.length > 0}
                             <div class="bg-gray-800/80 mt-2 border border-cyan-400 rounded p-2 max-h-40 overflow-y-auto">
-                                {#each searchResults as result}
+           
+                     {#each searchResults as result}
                                     <button class="w-full text-left p-2 hover:bg-cyan-600/20 text-sm" on:click={() => selectLocation(result, false)}>
-                                        <div class="font-medium">{result.display_name.split(',')[0]}</div>
+                               
+         <div class="font-medium">{result.display_name.split(',')[0]}</div>
                                         <div class="text-xs text-gray-500 truncate">{result.display_name}</div>
                                     </button>
-                                {/each}
+           
+                     {/each}
                             </div>
                         {/if}
                     </div>
-                {/if}
+       
+         {/if}
 
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">{selectedType.label} Name/Content</label>
                     <input type="text" bind:this={mainFieldRef} bind:value={mainField} on:keydown={handleMainField} class="input"/>
                 </div>
 
-                {#if selectedType.key === 'location'}
+        
+         {#if selectedType.key === 'location'}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Coordinates (Lat, Lng)</label>
                         <input type="text" bind:value={locationCoords} placeholder="Auto-filled from search or manual entry..." class="input" />
-                    </div>
+    
+                 </div>
                 {/if}
 
-                {#if selectedType.key === 'event' || selectedType.key === 'incident'}
+                {#if selectedType.key === 'event' ||
+ selectedType.key === 'incident'}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Date & Time (DD/MMM/YYYY HH:mm)</label>
                         <input type="text" bind:value={eventDateTimeStr} on:focus={handleEventTimeFocus} on:input={handleEventTimeInput} class="input"/>
-                    </div>
+                
+     </div>
                 {/if}
 
                 {#if selectedType.key === 'vehicle'}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">License Plate</label>
-                        <input type="text" bind:value={vehiclePlate} class="input"/>
+           
+             <input type="text" bind:value={vehiclePlate} class="input"/>
                     </div>
                 {/if}
 
                 <div class="relative">
                     <label class="block text-xs font-medium text-gray-500 mb-1">Description / Notes</label>
-                    <textarea bind:this={descriptionRef} bind:value={description} on:input={handleDescriptionInput} on:keydown={handleDescriptionKeydown} rows="4" class="input"></textarea>
+    
+                 <textarea bind:this={descriptionRef} bind:value={description} on:input={handleDescriptionInput} on:keydown={handleDescriptionKeydown} rows="4" class="input"></textarea>
                     <div class="text-xs text-gray-500 mt-1">Use <span class="text-cyan-400 font-mono">@</span> to link entities and <span class="text-cyan-400 font-mono">#</span> to link events.</div>
                     {#if mentionType}
-                      <div class="absolute bg-gray-800 border border-cyan-400 rounded-lg shadow-lg z-10" style="top: {descriptionRef?.offsetTop + descriptionRef?.offsetHeight}px; left: {descriptionRef?.offsetLeft}px">
+                     
+   <div class="absolute bg-gray-800 border border-cyan-400 rounded-lg shadow-lg z-10" style="top: {descriptionRef?.offsetTop + descriptionRef?.offsetHeight}px;
+ left: {descriptionRef?.offsetLeft}px">
                         {#each mentionSuggestions as suggestion, i}
-                          <button class="w-full text-left px-4 py-2 text-sm {i === mentionSelectionIndex ? 'bg-cyan-600/20' : ''}" on:click={() => insertMention(suggestion)}>
+                          <button class="w-full text-left px-4 py-2 text-sm {i === mentionSelectionIndex ?
+ 'bg-cyan-600/20' : ''}" on:click={() => insertMention(suggestion)}>
                             {suggestion.content || suggestion.title}
                           </button>
                         {/each}
-                      </div>
+               
+        </div>
                     {/if}
                 </div>
 
                 <div class="space-y-3 pt-3 border-t border-gray-700">
                     <h4 class="text-sm font-medium text-cyan-400">Linked Items</h4>
-                    
+             
+        
                     <div class="flex flex-wrap gap-2">
                         {#each [...linkedEntities, ...$entities.filter(e => existingLinkedIds.includes(e.id))] as linked}
                           <span class="bg-purple-500/30 text-purple-300 px-2 py-1 rounded text-xs flex items-center gap-1">
-                            {linked.content}
+     
+                        {linked.content}
                             <button on:click={() => removeLinkedEntity(linked.id)} class="text-red-400 hover:text-red-200">x</button>
                           </span>
-                        {/each}
+                  
+         {/each}
                     </div>
                     
                     <select class="input input-sm" on:change={e => addExistingLinkedId(parseInt(e.target.value))}>
                         <option value="">+ Link Existing Entity...</option>
-                        {#each $entities as entity} <option value={entity.id}>{entity.content}</option> {/each}
+ 
+                        {#each $entities.filter(e => e.id !== editingEntity?.id) as entity} <option value={entity.id}>{entity.content}</option> {/each}
                     </select>
 
-                    <select class="input input-sm" bind:value={linkedEventId}>
-                        <option value={null}>+ Link to Event/Incident...</option>
+                    <select class="input input-sm" multiple bind:value={linkedEventIds}>
+                        <option value={null} disabled>+ Link to Event/Incident...</option>
                         {#each $events as event} <option value={event.id}>{event.title}</option> {/each}
                     </select>
 
                     {#if showAddLinked}
-                        <div class="grid grid-cols-3 gap-2 p-2 border border-dashed border-gray-600 rounded">
+                        <div class="grid grid-cols-3 gap-2 p-2 
+ border border-dashed border-gray-600 rounded">
                             <select bind:value={linkedEntityType} class="input input-sm col-span-3 sm:col-span-1">
                                 <option value="phone">Phone</option> <option value="email">Email</option> <option value="vehicle">Vehicle</option> <option value="object">Object</option> <option value="location">Location</option>
-                            </select>
+                       
+             </select>
                             
                             {#if linkedEntityType === 'location'}
-                                <div class="col-span-3 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div class="col-span-3 sm:col-span-2 grid 
+ grid-cols-1 sm:grid-cols-2 gap-2">
                                     <input type="text" bind:value={linkedLocationName} placeholder="Location Name..." class="input input-sm col-span-2"/>
                                     <input type="text" bind:value={linkedLocationCoords} placeholder="Lat, Lng (optional)" class="input input-sm flex-1"/>
-                                    <button class="btn btn-small" on:click={() => step = 3}>Search</button>
+           
+                          <button class="btn btn-small" on:click={() => step = 3}>Search</button>
                                 </div>
                             {:else}
-                                <input type="text" bind:value={linkedEntityContent} placeholder="Content..." class="input input-sm col-span-3 sm:col-span-2"/>
+        
+                         <input type="text" bind:value={linkedEntityContent} placeholder="Content..." class="input input-sm col-span-3 sm:col-span-2"/>
                             {/if}
                             <button on:click={addLinkedEntity} class="btn btn-small col-span-3 sm:col-span-3">Add</button>
-                        </div>
+        
+                 </div>
                     {/if}
                      <button on:click={() => showAddLinked = !showAddLinked} class="text-cyan-400 text-xs hover:underline">
-                        {showAddLinked ? 'Cancel' : '+ Add & Link New Entity'}
+                        {showAddLinked ?
+ 'Cancel' : '+ Add & Link New Entity'}
                     </button>
                 </div>
 
                 <div class="flex gap-2 pt-4 border-t border-gray-800">
                     {#if !editingEntity}
-                        <button class="btn flex-1" on:click={() => { step = 1; setTimeout(() => typeInputRef?.focus(), 50); }}>Back</button>
+               
+         <button class="btn flex-1" on:click={() => { step = 1;
+ setTimeout(() => typeInputRef?.focus(), 50); }}>Back</button>
                     {/if}
-                    <button class="btn btn-primary flex-1" on:click={save}>{editingEntity ? 'Update' : 'Save'}</button>
+                    <button class="btn btn-primary flex-1" on:click={save}>{editingEntity ?
+ 'Update' : 'Save'}</button>
                 </div>
             </div>
         {:else if step === 3}
              <div>
                 <h4 class="text-sm font-medium text-cyan-400 mb-2">Link a New Location</h4>
                 <div class="flex gap-2">
-                    <input type="text" bind:value={locationSearch} placeholder="Search for a place..." class="input flex-1" on:keydown={(e) => e.key === 'Enter' && searchLocation(true)} />
-                    <button class="btn btn-small" on:click={() => searchLocation(true)} disabled={searchingLocation}>{searchingLocation ? '...' : 'Search'}</button>
+    
+                 <input type="text" bind:value={locationSearch} placeholder="Search for a place..." class="input flex-1" on:keydown={(e) => e.key === 'Enter' && searchLocation(true)} />
+                    <button class="btn btn-small" on:click={() => searchLocation(true)} disabled={searchingLocation}>{searchingLocation ?
+ '...' : 'Search'}</button>
                 </div>
                 {#if searchResults.length > 0}
                     <div class="bg-gray-800/80 mt-2 border border-cyan-400 rounded p-2 max-h-40 overflow-y-auto">
                         {#each searchResults as result}
-                            <button class="w-full text-left p-2 hover:bg-cyan-600/20 text-sm" on:click={() => selectLocation(result, true)}>
+        
+                     <button class="w-full text-left p-2 hover:bg-cyan-600/20 text-sm" on:click={() => selectLocation(result, true)}>
                                 <div class="font-medium">{result.display_name.split(',')[0]}</div>
                                 <div class="text-xs text-gray-500 truncate">{result.display_name}</div>
-                            </button>
+   
+                         </button>
                         {/each}
                     </div>
                 {/if}
-                
+               
+ 
                 <button class="btn btn-small mt-4 w-full" on:click={() => step = 2}>Back to Main Form</button>
             </div>
         {/if}

@@ -52,11 +52,6 @@
       <div class="text-2xl font-semibold text-green-400">{$stats.intel}</div>
       <div class="text-xs text-green-500/70 uppercase tracking-wider">Intel</div>
     </div>
-    
-    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 border border-pink-600/30 hover:border-pink-400 transition-all">
-      <div class="text-2xl font-semibold text-pink-400">{$stats.sources}</div>
-      <div class="text-xs text-pink-500/70 uppercase tracking-wider">Sources</div>
-    </div>
   </div>
   
   <div class="mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 border border-purple-600/30 hover:border-purple-400 transition-all">

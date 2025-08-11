@@ -109,7 +109,7 @@
     </div>
   {:else}
     <h3 class="text-sm font-medium text-cyan-300 mb-4">Location Map</h3>
-    <div bind:this={mapContainer} class="flex-1 rounded-lg overflow-hidden border border-cyan-600/30 bg-gray-900/80 backdrop-blur-sm min-h-0 terminal-glow"></div>
+    <div id="map-container-for-export" bind:this={mapContainer} class="flex-1 rounded-lg overflow-hidden border border-cyan-600/30 bg-gray-900/80 backdrop-blur-sm min-h-0 terminal-glow"></div>
   {/if}
 </div>
 

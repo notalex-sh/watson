@@ -11,11 +11,13 @@
   let zoom = 1;
   let resizeObserver;
   let layout = 'horizontal-tree';
+
   const nodeColors = {
     'text': '#00BCD4', 'email': '#9C27B0', 'phone': '#9C27B0', 'url': '#E91E63',
     'location': '#FF9800', 'vehicle': '#2196F3', 'object': '#FFEB3B',
     'event': '#2196F3', 'incident': '#E91E63', 'intel': '#4CAF50'
   };
+
   function applyLayout(shouldFit = true) {
     if (!canvas || $allItems.length === 0) {
         nodes = [];
@@ -24,6 +26,7 @@
     };
 
     const graphNodes = new Map($allItems.map(item => [item.id, { id: item.id, item, children: [], parent: null }]));
+
     $allLinks.forEach(link => {
         const fromNode = graphNodes.get(link.from);
         const toNode = graphNodes.get(link.to);
@@ -32,6 +35,7 @@
             toNode.parent = fromNode;
         }
     });
+
     const roots = Array.from(graphNodes.values()).filter(n => !n.parent);
 
     calculateNodePositions(roots, Array.from(graphNodes.values()));
@@ -48,6 +52,7 @@
     const visited = new Set();
     const nodeSpacingX = 250;
     const nodeSpacingY = 200;
+
     if (layout === 'horizontal-tree') {
         let yCursor = 0;
         function layoutSubtree(node, depth, y) {
@@ -96,18 +101,23 @@
 
   function fitAndCenter() {
       if (!canvas || nodes.length === 0) return;
+
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
       nodes.forEach(node => {
           minX = Math.min(minX, node.x);
           maxX = Math.max(maxX, node.x);
           minY = Math.min(minY, node.y);
           maxY = Math.max(maxY, node.y);
       });
+
       const graphWidth = (maxX - minX) || 1;
       const graphHeight = (maxY - minY) || 1;
       const padding = 150;
+
       const scaleX = (canvas.width - padding) / graphWidth;
       const scaleY = (canvas.height - padding) / graphHeight;
+
       zoom = Math.max(0.1, Math.min(scaleX, scaleY, 2));
 
       const graphCenterX = minX + graphWidth / 2;
@@ -117,12 +127,14 @@
           x: canvas.width / 2 - graphCenterX * zoom,
           y: canvas.height / 2 - graphCenterY * zoom
       };
+
       draw();
   }
 
   function draw() {
     if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     if ($allItems.length === 0) {
       ctx.fillStyle = '#666';
       ctx.font = '14px \'JetBrains Mono\', monospace';
@@ -136,6 +148,7 @@
     ctx.scale(zoom, zoom);
     ctx.strokeStyle = '#374151';
     ctx.lineWidth = 1.5 / zoom;
+
     $allLinks.forEach(link => {
       const fromNode = nodes.find(n => n.id === link.from);
       const toNode = nodes.find(n => n.id === link.to);
@@ -146,6 +159,7 @@
         ctx.stroke();
       }
     });
+
     nodes.forEach(node => {
       const nodeSize = (node.item.itemType === 'event' ? 25 : 20) / zoom;
       if (!isFinite(nodeSize) || nodeSize <= 0) return;
@@ -180,14 +194,24 @@
     ctx.restore();
   }
 
-  function handleMouseDown(e) { isPanning = true;
-    panStart.x = e.clientX - panOffset.x; panStart.y = e.clientY - panOffset.y;
+  function handleMouseDown(e) {
+    isPanning = true;
+    panStart.x = e.clientX - panOffset.x;
+    panStart.y = e.clientY - panOffset.y;
     canvas.style.cursor = 'grabbing';
   }
-  function handleMouseMove(e) { if (isPanning) { panOffset.x = e.clientX - panStart.x;
-  panOffset.y = e.clientY - panStart.y; draw();
-  } }
-  function handleMouseUp() { isPanning = false; canvas.style.cursor = 'grab';
+
+  function handleMouseMove(e) {
+    if (isPanning) {
+      panOffset.x = e.clientX - panStart.x;
+      panOffset.y = e.clientY - panStart.y;
+      draw();
+    }
+  }
+
+  function handleMouseUp() {
+    isPanning = false;
+    canvas.style.cursor = 'grab';
   }
 
   function handleWheel(e) {
@@ -223,7 +247,10 @@
     resizeObserver = new ResizeObserver(() => resizeCanvas());
     if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
   });
-  onDestroy(() => { if (resizeObserver) resizeObserver.disconnect(); });
+
+  onDestroy(() => {
+    if (resizeObserver) resizeObserver.disconnect();
+  });
 
   $: if (ctx) {
       const unsub = allItems.subscribe(() => applyLayout(false));
@@ -237,17 +264,17 @@
 
 <div class="flex flex-col h-full overflow-hidden bg-gray-900/30">
   <div class="p-2 flex flex-col md:flex-row gap-2">
-      <div class="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-x-3 gap-y-1 text-xs text-gray-400">
+      <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-xs text-gray-400">
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['event']};"></span>Event</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['incident']};"></span>Incident</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['text']};"></span>Person/Org</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['phone']};"></span>Contact</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['url']};"></span>Source</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['location']};"></span>Location</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['vehicle']};"></span>Vehicle</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['object']};"></span>Object</span>
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {nodeColors['intel']};"></span>Intel</span>
       </div>
+      
       <div class="flex-shrink-0 flex gap-2">
           <select bind:value={layout} class="input input-sm" on:change="{() => applyLayout(true)}">
               <option value="horizontal-tree">H-Tree</option>
@@ -255,7 +282,10 @@
               <option value="grid">Grid</option>
               <option value="circle">Circle</option>
           </select>
-          <button class="btn btn-small flex items-center justify-center" on:click={resetView} title="Reset View">
+          <button 
+              class="btn btn-small flex items-center justify-center" 
+              on:click={resetView} 
+              title="Reset View">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9a9 9 0 0 1 14.65-5.65M20 15a9 9 0 0 1-14.65 5.65" />
@@ -264,8 +294,15 @@
       </div>
   </div>
   <div class="flex-1 p-2 pt-0 min-h-0">
-   <div class="relative bg-gray-800/80 backdrop-blur-sm rounded-lg h-full border border-cyan-600/30 terminal-glow">
-      <canvas bind:this={canvas} class="absolute inset-0 cursor-grab w-full h-full" on:mousedown="{handleMouseDown}" on:mousemove="{handleMouseMove}" on:mouseup="{handleMouseUp}" on:mouseleave="{handleMouseUp}" on:wheel="{handleWheel}"/>
+   <div id="network-canvas-container" class="relative bg-gray-800/80 backdrop-blur-sm rounded-lg h-full border border-cyan-600/30 terminal-glow" style="background-color: #111827;">
+      <canvas 
+        bind:this={canvas} 
+        class="absolute inset-0 cursor-grab w-full h-full" 
+        on:mousedown="{handleMouseDown}" 
+        on:mousemove="{handleMouseMove}" 
+        on:mouseup="{handleMouseUp}" 
+        on:mouseleave="{handleMouseUp}" 
+        on:wheel="{handleWheel}"/>
     </div>
   </div>
 </div>

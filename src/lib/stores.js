@@ -1,5 +1,7 @@
 import { writable, derived } from 'svelte/store';
 
+export const exportRenderer = writable(null);
+
 export const briefTitle = writable('New Brief');
 export const caseNumber = writable('');
 export const entities = writable([]);

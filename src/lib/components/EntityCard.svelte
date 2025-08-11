@@ -38,12 +38,18 @@
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
   }
+
+  function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', entity.id);
+  }
 </script>
 
 <div class="entity-card transition-all duration-200 {isLinking ? 'ring-2 ring-cyan-500 shadow-xl shadow-cyan-900/30' : ''} {entity.type === 'incident' ? 'border-red-500/50 hover:border-red-400' : ''}" 
      on:click={() => !isLinking && (showModal = true)}
      on:keydown={(e) => e.key === 'Enter' && !isLinking && (showModal = true)}
-     role="button" tabindex="0">
+     role="button" tabindex="0"
+     draggable="true"
+     on:dragstart={handleDragStart}>
     <div class="flex justify-between items-start mb-2">
         <div>
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {

@@ -3,11 +3,12 @@
   import { onMount } from 'svelte';
   import { exportProject, importProject } from '$lib/utils';
   import { goto } from '$app/navigation';
-
+  import ExportModal from './ExportModal.svelte';
   let currentTime = '';
   let showAbout = false;
   let fileInput;
   let isEditingTitle = false;
+  let showExportModal = false;
   function updateTime() {
     const now = new Date();
     currentTime = now.toTimeString().split(' ')[0];
@@ -132,6 +133,7 @@
     <button class="btn btn-small" on:click={enterPresentationMode} title="Enter Presentation Mode (Ctrl+P)">Present</button>
     <button class="btn btn-small" on:click={() => fileInput.click()} title="Open project (Ctrl+O)">Open</button>
     <button class="btn btn-small" on:click={saveProject} title="Save project (Ctrl+S)">Save</button>
+    <button class="btn btn-small" on:click={() => showExportModal = true}>Export PDF</button>
     <button class="btn btn-small" on:click={openNewBrief} title="Open new brief (Ctrl+N)">New Brief</button>
     <button class="btn btn-primary btn-small" on:click={copyNotes}>Copy Notes</button>
     <button class="w-8 h-8 rounded bg-gray-800/80 backdrop-blur-sm hover:bg-cyan-600/20 border border-cyan-500/50 hover:border-cyan-400 flex items-center justify-center text-cyan-400 hover:text-cyan-300 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/30" on:click={toggleAbout} aria-label="About">?</button>
@@ -145,28 +147,18 @@
     <div class="bg-gray-950/95 backdrop-blur-md border border-cyan-400 rounded-lg p-6 max-w-2xl mx-4 shadow-2xl shadow-cyan-500/30 max-h-[90vh] overflow-y-auto animate-slide-in-up" on:click|stopPropagation>
       <h2 class="text-xl font-bold text-cyan-300 mb-4 cyber-glow">ABOUT WATSON</h2>
       <div class="space-y-4 text-sm text-gray-300">
-        <p>Watson is a lightweight, tactical intelligence tool designed for rapid data capture and analysis. It helps investigators and analysts quickly track entities, map relationships, and build timelines during fast-moving incidents or field operations.</p>
+        <p>Watson is a lightweight, tactical intelligence tool designed for rapid data capture and analysis. It helps investigators track entities, map relationships, and build timelines in fast-moving situations.</p>
         
         <div class="bg-yellow-500/20 border border-yellow-400/50 text-yellow-300 p-3 rounded flex gap-3">
             <svg class="w-6 h-6 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
             <p><strong>Important:</strong> This application stores all data locally in your browser session. All information will be lost when you close this tab unless you use the <strong>Save</strong> button to export your project to a `.wf` file.</p>
-        </div>
-        
-        <div class="mt-4 pt-4 border-t border-cyan-600/30">
-          <h3 class="text-base font-medium text-cyan-400 mb-3">Core Features</h3>
-            <ul class="list-disc list-inside space-y-2 text-gray-400">
-                <li><strong>Dynamic Note-Taking:</strong> A central editor for capturing free-form intelligence as it comes in.</li>
-                <li><strong>Entity Management:</strong> Add, edit, and link entities (People, Locations, Vehicles, Intel etc.) to build a clear operational picture.</li>
-                <li><strong>Visual Analysis:</strong> Automatically generated Network Graphs, Timelines, Maps and Intel views provide instant visual context.</li>
-                <li><strong>Presentation Mode:</strong> A full-screen, interactive view of your data, perfect for briefings and analysis.</li>
-                <li><strong>Data Persistence:</strong> Save and load your entire project, including notes, entities, and views, to a local file.</li>
-            </ul>
         </div>
 
         <div class="mt-4 pt-4 border-t border-cyan-600/30">
           <h3 class="text-base font-medium text-cyan-400 mb-3">Keyboard Shortcuts</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-400">
             <div><kbd class="text-cyan-300 font-mono">Shift + Tab</kbd> - Quick Add New Item</div>
+            <div><kbd class="text-cyan-300 font-mono">Shift + Space</kbd> - Global Search</div>
             <div><kbd class="text-cyan-300 font-mono">/ (in notes)</kbd> - Quick Insert Entity</div>
             <div><kbd class="text-cyan-300 font-mono">@ / # (in Quick Add)</kbd> - Mention Entity / Event</div>
             <div><kbd class="text-cyan-300 font-mono">/now + Space</kbd> - Insert Current Time</div>
@@ -184,15 +176,17 @@
           </div>
         </div>
         <p class="text-gray-400 text-xs pt-4 border-t border-gray-700 mt-4">
-            Watson is fully open source to ensure transparency and trust.
-            See the code at <a href="https://github.com/notalex-sh/watson" target="_blank" class="text-cyan-300 underline hover:text-cyan-200">github.com/notalex-sh/watson</a>.
+            Watson is fully open source to ensure transparency and trust. See the code at <a href="https://github.com/notalex-sh/watson" target="_blank" class="text-cyan-300 underline hover:text-cyan-200">github.com/notalex-sh/watson</a>.
         </p>
         <p class="text-gray-500 text-xs pt-2">
-            Created by
-            <a href="https://www.notalex.sh" target="_blank" class="text-cyan-300 underline hover:text-cyan-200">notalex.sh</a>.
+            Created by <a href="https://www.notalex.sh" target="_blank" class="text-cyan-300 underline hover:text-cyan-200">notalex.sh</a>.
         </p>
       </div>
       <button class="btn btn-primary w-full mt-6" on:click={toggleAbout}>Close</button>
     </div>
   </div>
+{/if}
+
+{#if showExportModal}
+    <ExportModal on:close={() => showExportModal = false} />
 {/if}
