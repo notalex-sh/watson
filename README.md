@@ -4,7 +4,7 @@
 
 ![Watson Banner](./banner.png)
 
-[watson](https://watson-intel.vercel.app/)
+[Try Watson](https://watson-intel.vercel.app/)
 
 **Watson** is a lightweight, browser-based intelligence platform designed for rapid data capture, visualization, and analysis in dynamic situations.
 
