@@ -1,12 +1,14 @@
 # Watson: Tactical Intelligence Platform
-[watson](https://watson-intel.vercel.app/)
 
-
-> **Watson** is a lightweight, browser-based intelligence platform designed for rapid data capture, visualization, and analysis in dynamic situations.
-
-Built for investigators, journalists, and researchers, Watson provides a powerful, keyboard-first suite of tools to quickly make sense of complex information.
+> Capture fast, visualize instantly, understand immediately.
 
 ![Watson Banner](./banner.png)
+
+[watson](https://watson-intel.vercel.app/)
+
+**Watson** is a lightweight, browser-based intelligence platform designed for rapid data capture, visualization, and analysis in dynamic situations.
+
+Built for investigators, journalists, and researchers, Watson provides a powerful, keyboard-first suite of tools to quickly make sense of complex information.
 
 ---
 
