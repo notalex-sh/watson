@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-gray-1000 text-gray-300 antialiased;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    *:not(.preview-page):not(.preview-page *) {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply px-4 py-2 bg-gray-900/80 backdrop-blur-sm border border-cyan-500/50 text-cyan-300 rounded text-sm font-medium transition-all duration-300 hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-400/30 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide relative overflow-hidden;
+    }
+
+    .btn::before {
+        @apply absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300/10 to-transparent -skew-x-12 -translate-x-full transition-transform duration-700;
+        content: '';
+    }
+
+    .btn:hover::before {
+        @apply translate-x-full;
+    }
+
+    .btn-primary {
+        @apply bg-cyan-400 border-cyan-300 text-gray-950 hover:bg-cyan-300/90 hover:border-cyan-200 shadow-lg shadow-cyan-400/40 font-semibold;
+    }
+
+    .btn-danger {
+        @apply text-red-300 border-red-500/50 hover:bg-red-500/20 hover:border-red-400 hover:text-red-200 hover:shadow-red-400/30;
+    }
+
+    .btn-small {
+        @apply px-3 py-1.5 text-xs;
+    }
+
+    .input {
+        @apply w-full px-3 py-2 bg-gray-900/80 backdrop-blur-sm border border-cyan-600/30 text-cyan-100 text-sm rounded transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent focus:bg-gray-900/90 placeholder-gray-500;
+    }
+
+    .input-sm {
+        @apply px-2 py-1.5 text-xs;
+    }
+
+    .entity-card {
+        @apply bg-gray-900/80 backdrop-blur-sm border border-gray-700/80 rounded-lg p-4 mb-3 transition-all duration-300 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 hover:bg-gray-800/90 cursor-pointer;
+    }
+
+}
+
+@layer utilities {
+    .terminal-glow {
+        @apply shadow-lg shadow-cyan-400/30;
+    }
+
+    .cyber-glow {
+        text-shadow: 0 0 5px theme('colors.cyan.400'), 0 0 10px theme('colors.cyan.400');
+    }
+
+    @keyframes blink {
+
+        0%,
+        50% {
+            opacity: 1;
+        }
+
+        51%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    .delay-50 {
+        transition-delay: 50ms;
+    }
+    .delay-100 {
+        transition-delay: 100ms;
+    }
+    .delay-150 {
+        transition-delay: 150ms;
+    }
+    .delay-200 {
+        transition-delay: 200ms;
+    }
+    .delay-250 {
+        transition-delay: 250ms;
+    }
+
+    .cursor-blink::after {
+        content: '_';
+        animation: blink 1s infinite;
+    }
+
+    .leaflet-container {
+        background-color: theme('colors.gray.900') !important;
+        z-index: 1;
+    }
+
+    .leaflet-pane {
+        z-index: 1;
+    }
+
+    .leaflet-top,
+    .leaflet-bottom {
+        z-index: 10;
+    }
+
+    .leaflet-popup {
+        z-index: 20;
+    }
+}
