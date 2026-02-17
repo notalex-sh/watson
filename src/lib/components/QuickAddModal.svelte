@@ -370,17 +370,6 @@
         return new Date(year, month, day, hours, minutes);
     }
 
-    function findDuplicates(content, type) {
-        const normalizedContent = content.toLowerCase().trim();
-        return $entities.filter(e => {
-            const normalizedExisting = (e.content || '').toLowerCase().trim();
-            if (normalizedExisting === normalizedContent) return true;
-            if (normalizedContent.length > 3 && normalizedExisting.includes(normalizedContent)) return true;
-            if (normalizedExisting.length > 3 && normalizedContent.includes(normalizedExisting)) return true;
-            return false;
-        });
-    }
-
     function save() {
         if (!mainField) {
             alert('Please fill in the main field.');
@@ -388,15 +377,6 @@
         }
 
         const isEvent = selectedType.key === 'event' || selectedType.key === 'incident';
-
-        if (!editingEntity && !isEvent) {
-            const duplicates = findDuplicates(mainField, selectedType.key);
-            if (duplicates.length > 0) {
-                const dupNames = duplicates.map(d => `"${d.content}" (${d.type})`).join(', ');
-                const proceed = confirm(`Similar entities found: ${dupNames}\n\nDo you want to create this entity anyway?`);
-                if (!proceed) return;
-            }
-        }
 
         const newlyCreatedLinkedIds = linkedEntities.map(le => {
             entityIdCounter.update(n => n + 1);
