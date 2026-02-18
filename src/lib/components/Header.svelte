@@ -409,6 +409,7 @@
 
 <header class="h-12 bg-gray-950 border-b border-cyan-600/30 px-4 flex justify-between items-center relative z-10">
   <div class="flex items-center gap-3">
+    <img src="/watson-logo.png" alt="Watson" class="w-6 h-6" />
     <h1 class="text-base font-bold tracking-wider text-cyan-400">WATSON</h1>
     <span class="px-1.5 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/50 rounded">BETA</span>
     <span class="text-xs text-cyan-400/60 font-mono">{currentTime}</span>
@@ -640,6 +641,7 @@
         </svg>
       </button>
       <div class="flex items-center gap-3 mb-4">
+        <img src="/watson-logo.png" alt="Watson" class="w-10 h-10" />
         <h2 class="text-xl font-bold text-cyan-300">WATSON</h2>
         <span class="px-2 py-0.5 text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/50 rounded">{APP_STAGE}</span>
         <span class="text-xs text-gray-500 font-mono">v{APP_VERSION}</span>

@@ -137,6 +137,7 @@
 {#if isUnsupportedScreen}
     <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50 text-center p-4">
         <div>
+            <img src="/watson-logo.png" alt="Watson" class="w-16 h-16 mx-auto mb-3 drop-shadow-[0_0_10px_rgba(0,221,255,0.4)]" />
             <h1 class="text-3xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
             <p class="text-gray-400">
                 Unsupported screen dimensions.
@@ -148,7 +149,8 @@
   <div class="fixed inset-0 bg-gray-950 flex items-center justify-center z-50 overflow-hidden">
     <canvas bind:this={canvas} class="absolute inset-0 w-full h-full"></canvas>
     <div class="text-center z-10">
-      <h1 class="text-4xl font-bold text-cyan-400 mb-2 tracking-wider animate-pulse">WATSON</h1>
+      <img src="/watson-logo.png" alt="Watson" class="w-24 h-24 mx-auto mb-4 animate-pulse drop-shadow-[0_0_15px_rgba(0,221,255,0.4)]" />
+      <h1 class="text-4xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
       <p class="text-sm text-gray-500 mb-8">Intel. Fast. Field-Ready.</p>
       
       <div class="w-64 mx-auto mb-4">

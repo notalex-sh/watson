@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="watson-logo.png" alt="Watson Logo" width="120" />
+</p>
+
 # Watson
 
 Browser-based intelligence platform for rapid data capture and visualization.
