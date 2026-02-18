@@ -13,6 +13,7 @@
   const totalComponents = 7;
   let assetsLoaded = false;
   let isUnsupportedScreen = false;
+  let logoReady = false;
   let canvas;
   let animationFrameId;
 
@@ -38,6 +39,15 @@
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     window.addEventListener('beforeunload', beforeUnloadHandler);
+
+    const logoImg = new Image();
+    logoImg.src = '/watson-logo.png';
+    if (logoImg.complete) {
+      logoReady = true;
+    } else {
+      logoImg.onload = () => { logoReady = true; };
+      logoImg.onerror = () => { logoReady = true; };
+    }
 
     if (isUnsupportedScreen) {
         loading = false;
@@ -148,7 +158,7 @@
 {:else if loading}
   <div class="fixed inset-0 bg-gray-950 flex items-center justify-center z-50 overflow-hidden">
     <canvas bind:this={canvas} class="absolute inset-0 w-full h-full"></canvas>
-    <div class="text-center z-10">
+    <div class="text-center z-10 transition-opacity duration-150" class:opacity-0={!logoReady}>
       <img src="/watson-logo.png" alt="Watson" class="w-24 h-24 mx-auto mb-4 animate-pulse drop-shadow-[0_0_15px_rgba(0,221,255,0.4)]" />
       <h1 class="text-4xl font-bold text-cyan-400 mb-2 tracking-wider">WATSON</h1>
       <p class="text-sm text-gray-500 mb-8">Intel. Fast. Field-Ready.</p>
